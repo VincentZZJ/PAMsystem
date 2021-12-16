@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2021-12-07 14:10:37
- * @LastEditTime: 2021-12-08 09:33:09
+ * @LastEditTime: 2021-12-16 19:22:04
  * @LastEditors: Vincent
  * @Description:
  */
@@ -13,6 +13,11 @@ const {
 } = require('../models/userModel');
 const { setResponseBody } = require('../utils/utils');
 
+/**
+ * @description: 根据用户姓名获取用户信息
+ * @param {*} ctx
+ * @return {*}
+ */
 const getUserInfo = async (ctx) => {
   const { username } = ctx.request.query;
   try {
@@ -23,6 +28,11 @@ const getUserInfo = async (ctx) => {
   }
 };
 
+/**
+ * @description: 录入用户信息
+ * @param {*} ctx
+ * @return {*}
+ */
 const addUser = async (ctx) => {
   const { username, password } = ctx.request.body;
   try {
@@ -33,6 +43,11 @@ const addUser = async (ctx) => {
   }
 };
 
+/**
+ * @description: 根据用户ID删除用户
+ * @param {*} ctx
+ * @return {*}
+ */
 const delUser = async (ctx) => {
   const { id } = ctx.request.query;
   try {
@@ -43,6 +58,11 @@ const delUser = async (ctx) => {
   }
 };
 
+/**
+ * @description: 根据用户ID更新用户数据
+ * @param {*} ctx
+ * @return {*}
+ */
 const updateUserInfoById = async (ctx) => {
   const { id, username, password } = ctx.request.body;
   try {
