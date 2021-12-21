@@ -1,27 +1,47 @@
 /*
  * @Author: Vincent
  * @Date: 2021-12-07 14:10:37
- * @LastEditTime: 2021-12-16 19:22:04
+ * @LastEditTime: 2021-12-21 15:54:06
  * @LastEditors: Vincent
  * @Description:
  */
 const {
-  getUserByUsername,
-  addUserInfo,
-  delUserById,
-  updateUserInfo,
+  getUserByUserphoneModel,
+  addUserInfoModel,
+  delUserByIdModel,
+  updateUserInfoModel,
 } = require('../models/userModel');
+const UUID = require('node-uuid');
 const { setResponseBody } = require('../utils/utils');
 
 /**
- * @description: 根据用户姓名获取用户信息
+ * @description: 登录
  * @param {*} ctx
  * @return {*}
  */
-const getUserInfo = async (ctx) => {
-  const { username } = ctx.request.query;
+const userLoginCtrl = async (ctx) => {
+  const { phone, password } = ctx.request.body;
   try {
-    const result = await getUserByUsername(username);
+    const result = await getUserByUserphoneModel(phone);
+    if (result && result.password === password) {
+      ctx.body = setResponseBody({ phone, username: result.username, token: result.id });
+    } else {
+      ctx.body = setResponseBody({}, '-1', '登录失败');
+    }
+  } catch (e) {
+    ctx.body = setResponseBody(e, '-1', '服务出错');
+  }
+};
+
+/**
+ * @description: 根据用户手机获取用户信息
+ * @param {*} ctx
+ * @return {*}
+ */
+const getUserInfoCtrl = async (ctx) => {
+  const { phone } = ctx.request.query;
+  try {
+    const result = await getUserByUserphoneModel(phone);
     ctx.body = setResponseBody(result);
   } catch (e) {
     ctx.body = setResponseBody(e, '-1', '服务出错');
@@ -33,10 +53,10 @@ const getUserInfo = async (ctx) => {
  * @param {*} ctx
  * @return {*}
  */
-const addUser = async (ctx) => {
-  const { username, password } = ctx.request.body;
+const addUserCtrl = async (ctx) => {
+  const { username, password, phone } = ctx.request.body;
   try {
-    const result = await addUserInfo({ username, password });
+    const result = await addUserInfoModel({ username, password, phone });
     ctx.body = setResponseBody(result);
   } catch (e) {
     ctx.body = setResponseBody(e, '-1', '服务出错');
@@ -48,10 +68,10 @@ const addUser = async (ctx) => {
  * @param {*} ctx
  * @return {*}
  */
-const delUser = async (ctx) => {
+const delUserCtrl = async (ctx) => {
   const { id } = ctx.request.query;
   try {
-    const result = await delUserById(id);
+    const result = await delUserByIdModel(id);
     ctx.body = setResponseBody(result);
   } catch (e) {
     ctx.body = setResponseBody(e, '-1', '服务出错');
@@ -63,14 +83,14 @@ const delUser = async (ctx) => {
  * @param {*} ctx
  * @return {*}
  */
-const updateUserInfoById = async (ctx) => {
-  const { id, username, password } = ctx.request.body;
+const updateUserInfoByIdCtrl = async (ctx) => {
+  const { id, username, password, phone } = ctx.request.body;
   try {
-    const result = await updateUserInfo({ id, username, password });
+    const result = await updateUserInfoModel(id, { username, password, phone });
     if (result.length && result[0] === 1) {
       ctx.body = setResponseBody();
     } else {
-      ctx.body = setResponseBody({ info: '未找到用户' });
+      ctx.body = setResponseBody({ desc: '未找到用户' });
     }
   } catch (e) {
     ctx.body = setResponseBody(e, '-1', '服务出错');
@@ -78,8 +98,9 @@ const updateUserInfoById = async (ctx) => {
 };
 
 module.exports = {
-  getUserInfo,
-  addUser,
-  delUser,
-  updateUserInfoById,
+  getUserInfoCtrl,
+  addUserCtrl,
+  delUserCtrl,
+  updateUserInfoByIdCtrl,
+  userLoginCtrl,
 };
