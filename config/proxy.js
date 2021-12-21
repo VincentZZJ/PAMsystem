@@ -1,3 +1,10 @@
+/*
+ * @Author: Vincent
+ * @Date: 2021-12-06 10:50:51
+ * @LastEditTime: 2021-12-21 17:10:23
+ * @LastEditors: Vincent
+ * @Description:
+ */
 /**
  * 在生产环境 代理是无法生效的，所以这里没有生产环境的配置
  * -------------------------------
@@ -16,6 +23,10 @@ export default {
       // 依赖 origin 的功能可能需要这个，比如 cookie
       changeOrigin: true,
     },
+    '/pamsystem/': {
+      target: 'http://localhost:8889',
+      changeOrigin: true,
+    },
   },
   test: {
     '/api/': {
@@ -26,13 +37,13 @@ export default {
       },
     },
   },
-  pre: {
-    '/api/': {
-      target: 'your pre url',
-      changeOrigin: true,
-      pathRewrite: {
-        '^': '',
-      },
-    },
-  },
+  // pre: {
+  //   '/pamsystem/': {
+  //     target: 'localhost:8889',
+  //     changeOrigin: false,
+  //     pathRewrite: {
+  //       '^': '',
+  //     },
+  //   },
+  // },
 };

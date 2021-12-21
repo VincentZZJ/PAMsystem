@@ -1,3 +1,10 @@
+/*
+ * @Author: Vincent
+ * @Date: 2021-12-06 10:50:51
+ * @LastEditTime: 2021-12-18 15:04:16
+ * @LastEditors: Vincent
+ * @Description:
+ */
 export default [
   {
     path: '/user',
@@ -15,6 +22,16 @@ export default [
       },
       {
         component: './404',
+      },
+    ],
+  },
+  {
+    path: '/usercenter',
+    layout: false,
+    routes: [
+      {
+        path: '/usercenter/login',
+        component: './usercenter/Login',
       },
     ],
   },
