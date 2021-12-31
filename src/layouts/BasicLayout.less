@@ -1,0 +1,62 @@
+/*
+ * @Author: Vincent
+ * @Date: 2021-12-24 13:55:51
+ * @LastEditTime: 2021-12-31 17:01:40
+ * @LastEditors: Vincent
+ * @Description: layout样式
+ */
+@import '../baseStyles.less';
+
+.wrap {
+  width: 100%;
+  height: 100%;
+  background-color: #f0f3f5;
+  .pageTop {
+    display: flex;
+    justify-content: space-between;
+    height: 3.5rem;
+    margin-bottom: 0.5rem;
+    padding: 0 0.5rem;
+    color: #fff;
+    line-height: 3.5rem;
+    background-color: #000;
+    & > div:first-child {
+      color: #fff;
+      font-weight: bold;
+      font-size: 1.5rem;
+    }
+    & > div:last-child {
+      display: flex;
+      span {
+        margin: 0 0.5rem;
+        font-size: 1rem;
+        cursor: pointer;
+        &:hover {
+          color: #3ac1ff;
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+  .pageContent {
+    display: flex;
+    height: calc(100% - 4rem);
+    padding: 0 0.5rem;
+    .pageLeftSide {
+      width: 12rem;
+      margin-right: 0.5rem;
+      background-color: #fff;
+      :global {
+        .ant-menu-item,
+        .ant-menu-submenu {
+          font-size: 1rem;
+        }
+      }
+    }
+    .pageRightContent {
+      width: calc(100% - 12.5rem);
+      padding: 0.8rem;
+      background-color: #fff;
+    }
+  }
+}
