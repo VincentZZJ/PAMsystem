@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2021-12-07 14:10:37
- * @LastEditTime: 2021-12-21 15:54:06
+ * @LastEditTime: 2021-12-24 13:33:48
  * @LastEditors: Vincent
  * @Description:
  */
@@ -11,7 +11,6 @@ const {
   delUserByIdModel,
   updateUserInfoModel,
 } = require('../models/userModel');
-const UUID = require('node-uuid');
 const { setResponseBody } = require('../utils/utils');
 
 /**
@@ -24,9 +23,9 @@ const userLoginCtrl = async (ctx) => {
   try {
     const result = await getUserByUserphoneModel(phone);
     if (result && result.password === password) {
-      ctx.body = setResponseBody({ phone, username: result.username, token: result.id });
+      ctx.body = setResponseBody({ phone, username: result.username, userId: result.id });
     } else {
-      ctx.body = setResponseBody({}, '-1', '登录失败');
+      ctx.body = setResponseBody({}, '-1', '账号密码错误');
     }
   } catch (e) {
     ctx.body = setResponseBody(e, '-1', '服务出错');
@@ -42,7 +41,11 @@ const getUserInfoCtrl = async (ctx) => {
   const { phone } = ctx.request.query;
   try {
     const result = await getUserByUserphoneModel(phone);
-    ctx.body = setResponseBody(result);
+    if (result && result.phone === phone) {
+      ctx.body = setResponseBody({ phone, username: result.username, userId: result.id });
+    } else {
+      ctx.body = setResponseBody({}, '-1', result.desc);
+    }
   } catch (e) {
     ctx.body = setResponseBody(e, '-1', '服务出错');
   }
@@ -57,7 +60,11 @@ const addUserCtrl = async (ctx) => {
   const { username, password, phone } = ctx.request.body;
   try {
     const result = await addUserInfoModel({ username, password, phone });
-    ctx.body = setResponseBody(result);
+    if (result.phone === phone) {
+      ctx.body = setResponseBody(result);
+    } else {
+      ctx.body = setResponseBody({}, '-1', result.desc);
+    }
   } catch (e) {
     ctx.body = setResponseBody(e, '-1', '服务出错');
   }
@@ -72,7 +79,11 @@ const delUserCtrl = async (ctx) => {
   const { id } = ctx.request.query;
   try {
     const result = await delUserByIdModel(id);
-    ctx.body = setResponseBody(result);
+    if (result) {
+      ctx.body = setResponseBody();
+    } else {
+      ctx.body = setResponseBody({}, '-1', '删除失败');
+    }
   } catch (e) {
     ctx.body = setResponseBody(e, '-1', '服务出错');
   }
