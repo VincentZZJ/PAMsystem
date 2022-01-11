@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2021-12-07 14:12:16
- * @LastEditTime: 2021-12-21 15:39:52
+ * @LastEditTime: 2022-01-11 13:41:18
  * @LastEditors: Vincent
  * @Description: 接口映射
  */
@@ -10,6 +10,7 @@
 // 实例化路由
 const router = require('koa-router')();
 const userCtrl = require('../controllers/userCtrl');
+const investCtrl = require('../controllers/investCtrl');
 
 // 定义路由前缀
 router.prefix('/pamsystem');
@@ -29,5 +30,11 @@ router.delete('/usercenter/delUserById', userCtrl.delUserCtrl);
 
 // 根据ID更新用户信息
 router.post('/usercenter/updateUserById', userCtrl.updateUserInfoByIdCtrl);
+
+// 增加投资项
+router.post('/investmng/addInvest', investCtrl.addInvestItemCtrl);
+
+// 根据查询条件查询所有投资项
+router.get('/investmng/getAllInvestByOpts', investCtrl.getInvestListByOptionsCtrl);
 
 module.exports = router;
