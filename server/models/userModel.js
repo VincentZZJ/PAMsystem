@@ -1,11 +1,11 @@
 /*
  * @Author: Vincent
  * @Date: 2021-12-07 14:06:31
- * @LastEditTime: 2021-12-22 16:11:46
+ * @LastEditTime: 2022-01-12 17:02:35
  * @LastEditors: Vincent
  * @Description:
  */
-const Mysql = require('../config/mysql');
+const { Mysql } = require('../config/mysql');
 const UUID = require('node-uuid');
 const User = Mysql.sys_user;
 

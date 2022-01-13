@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2021-12-07 14:12:16
- * @LastEditTime: 2022-01-11 13:41:18
+ * @LastEditTime: 2022-01-12 11:02:35
  * @LastEditors: Vincent
  * @Description: 接口映射
  */
@@ -36,5 +36,11 @@ router.post('/investmng/addInvest', investCtrl.addInvestItemCtrl);
 
 // 根据查询条件查询所有投资项
 router.get('/investmng/getAllInvestByOpts', investCtrl.getInvestListByOptionsCtrl);
+
+// 根据投资项id删除
+router.delete('/investmng/deleteInvestItemById', investCtrl.deleteInvestItemByIdCtrl);
+
+// 更新投资项
+router.post('/investmng/addInvestRecord', investCtrl.addInvestRecordCtrl);
 
 module.exports = router;
