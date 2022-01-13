@@ -1,0 +1,52 @@
+@import '../../../baseStyles.less';
+
+:global {
+  .redCls {
+    color: red;
+  }
+  .greenCls {
+    color: green;
+  }
+  .linkCls {
+    color: #1890ff;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+}
+
+.wrap {
+  //   display: flex;
+  //   flex-direction: column;
+  .top {
+    display: flex;
+    justify-content: space-between;
+  }
+  :global {
+    .inputWidth {
+      width: unit(200 / @baseFontSize, rem);
+    }
+    .ant-form-item {
+      margin-right: 0 !important;
+      margin-left: 0.5rem;
+    }
+    .headTitleName {
+      font-weight: bold;
+      font-size: unit(18 / @baseFontSize, rem);
+    }
+    .headTitleValue {
+      margin-right: 2rem;
+      font-weight: bold;
+      font-size: unit(24 / @baseFontSize, rem);
+    }
+  }
+}
+
+.beforeOpt,
+.afterOpt {
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+  & > span {
+    margin-right: 2rem;
+    font-weight: bold;
+  }
+}

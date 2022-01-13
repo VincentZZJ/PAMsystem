@@ -13,7 +13,6 @@ const BasicLayout = (props) => {
   const { children, route } = props;
   const { currentUser } = initialState;
   console.log(props);
-
   // 退出登录
   const logoutFun = async () => {
     await setInitialState((s) => ({ ...s, currentUser: undefined }));
@@ -32,11 +31,13 @@ const BasicLayout = (props) => {
             </SubMenu>
           );
         }
-        return (
-          <Menu.Item key={item.path} icon={<IconFont type={item.icon} />}>
-            {item.name}
-          </Menu.Item>
-        );
+        if (item.icon) {
+          return (
+            <Menu.Item key={item.path} icon={<IconFont type={item.icon} />}>
+              {item.name}
+            </Menu.Item>
+          );
+        }
       });
     }
   };

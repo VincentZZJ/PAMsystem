@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2021-12-06 10:50:51
- * @LastEditTime: 2021-12-31 17:00:55
+ * @LastEditTime: 2022-01-08 16:14:31
  * @LastEditors: Vincent
  * @Description:
  */
@@ -83,22 +83,26 @@ export default [
         isRoutes: true,
       },
       {
-        path: '/financial/overview',
-        name: '财务管理',
+        path: '/financial',
+        name: '投资管理',
         icon: 'icon-asset',
         isRoutes: true,
         routes: [
           {
+            path: '/financial',
+            redirect: '/financial/overview',
+          },
+          {
             path: '/financial/overview',
-            name: '财务概览',
+            name: '投资概览',
             icon: 'icon-analysis',
             component: './financial/OverView',
           },
           {
-            path: '/f2',
-            name: '财务清单',
+            path: '/financial/investlist',
+            name: '投资清单',
             icon: 'icon-project-overview',
-            component: './Welcome',
+            component: './financial/InvestList',
           },
         ],
       },
