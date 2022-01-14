@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2022-01-11 15:41:54
- * @LastEditTime: 2022-01-12 10:24:07
+ * @LastEditTime: 2022-01-14 11:29:10
  * @LastEditors: Vincent
  * @Description:
  */
@@ -27,5 +27,14 @@ export async function getInvestListByOptService(data) {
 export async function deleteInvestItemService(id) {
   return request(`/pamsystem/investmng/deleteInvestItemById?id=${id}`, {
     method: 'delete',
+  });
+}
+
+// 更新投资信息
+export async function updateInvestService(data) {
+  return request(`/pamsystem/investmng/addInvestRecord`, {
+    method: 'post',
+    requestType: 'form',
+    data,
   });
 }

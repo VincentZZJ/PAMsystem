@@ -17,6 +17,7 @@ import {
   getInvestListByOptService,
   addInvestService,
   deleteInvestItemService,
+  updateInvestService,
 } from '@/services/pamsystem/investmng';
 import { InvestType, InvestOpt } from '@/utils/constant';
 
@@ -28,6 +29,7 @@ const Page = () => {
   const [recordsTotal, setRecordsTotal] = useState(0);
   const [investList, setInvestList] = useState([]);
   const [statInfo, setStatInfo] = useState({});
+  const [latestInfo, setLatestInfo] = useState({});
   const [searchForm] = Form.useForm();
   const [addForm] = Form.useForm();
   const [updateForm] = Form.useForm();
@@ -44,6 +46,15 @@ const Page = () => {
         (pagination.currentPage - 1) * pagination.pageSize + index + 1,
     },
     {
+      title: '状态',
+      dataIndex: 'status',
+      render: (text) => (
+        <span className={`statusTag ${text ? 'isDoingCls' : 'isDoneCls'}`}>
+          {text ? '进行中' : '已结束'}
+        </span>
+      ),
+    },
+    {
       title: '投资类型',
       dataIndex: 'investType',
       render: (text) => InvestType[text],
@@ -57,11 +68,19 @@ const Page = () => {
       dataIndex: 'buyTime',
     },
     {
+      title: '持仓',
+      dataIndex: 'buyNum',
+    },
+    {
       title: '成本',
       dataIndex: 'buyCost',
     },
     {
       title: '投资金额',
+      dataIndex: 'totalInvest',
+    },
+    {
+      title: '市值',
       dataIndex: 'totalMoney',
     },
     {
@@ -77,12 +96,15 @@ const Page = () => {
     {
       title: '盈亏',
       dataIndex: 'profit',
-      render: (text) => text || '/',
+      render: (text) => <span className={`${text > 0 ? 'redCls' : 'greenCls'}`}>{text ?? 0}</span>,
     },
     {
       title: '盈亏率',
-      dataIndex: 'profitRate',
-      render: (text) => text || '/',
+      render: (text, record) => {
+        const { totalMoney, profit } = record;
+        const rate = (parseFloat(profit / totalMoney) * 100).toFixed(2);
+        return <span className={`${profit > 0 ? 'redCls' : 'greenCls'}`}>{`${rate}%`}</span>;
+      },
     },
     {
       title: '操作',
@@ -101,6 +123,11 @@ const Page = () => {
       },
     },
   ];
+
+  const formLayouts = {
+    labelCol: { span: 6 },
+    wrapperCol: { span: 18 },
+  };
 
   // 渲染展开的dom
   const expandedRowRender = (record) => {
@@ -128,6 +155,29 @@ const Page = () => {
         message.success('新增成功');
         setAddModalVisible(false);
         setIsRefresh(new Date().valueOf());
+        addForm.resetFields();
+      } else {
+        message.error(response?.desc ?? '新增失败，请联系运维人员');
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  // 更新投资项
+  const updateFormFinish = async (val) => {
+    const { date } = val;
+    const params = { ...val, date: date.format('YYYY-MM-DD'), ...latestInfo, id: curRecord.id };
+    try {
+      const response = await updateInvestService({ ...params });
+      if (response && response.code === '0') {
+        message.success('更新成功');
+        setUpdateModalVisible(false);
+        setCurRecord({});
+        setIsRefresh(new Date().valueOf());
+        updateForm.resetFields();
+      } else {
+        message.error(response?.desc ?? '更新失败，请联系运维人员');
       }
     } catch (e) {
       console.log(e);
@@ -157,15 +207,55 @@ const Page = () => {
   ];
 
   // 当操作交易数量发生变化时，动态计算操作后的数值
-  const handleInvestNumChange = (val) => {
-    // 操作后的成本、盈亏、总投资
-    console.log(val);
+  const handleInvestNumChange = (ev) => {
+    const investNum = parseInt(ev.target.value);
+    const investCost = parseFloat(updateForm.getFieldValue('investCost'));
+    if (investCost) {
+      updateLatestInfo(investCost, investNum);
+    }
+  };
+
+  // 交易价格发生变化
+  const handleInvestCostChange = (ev) => {
+    const investCost = parseFloat(ev.target.value);
+    const investNum = parseInt(updateForm.getFieldValue('investNum'));
+    if (investNum) {
+      updateLatestInfo(investCost, investNum);
+    }
+  };
+
+  const updateLatestInfo = (investCost, investNum) => {
+    const optType = updateForm.getFieldValue('investOpt');
+    const { totalMoney, buyNum, buyCost } = curRecord;
+    let money = totalMoney;
+    let num = buyNum;
+    if (optType === '1') {
+      // 加仓
+      money = money + investCost * investNum;
+      num = buyNum + investNum;
+    } else if (optType === '2') {
+      // 减仓
+      money = money - investCost * investNum;
+      num = buyNum - investNum;
+    } else {
+      // 清仓
+      money = 0;
+    }
+    const profit = buyNum * (investCost - buyCost);
+    const latestCost = parseFloat(money / num);
+    setLatestInfo({
+      totalMoney: money,
+      buyNum: num,
+      latestCost,
+      profit,
+    });
   };
 
   // 进行加/减/清仓操作
   const handleUpdateOpt = (record) => {
     setUpdateModalVisible(true);
     setCurRecord(record);
+    setLatestInfo({});
   };
 
   // 删除投资项
@@ -207,7 +297,7 @@ const Page = () => {
     <div className={styles.wrap}>
       <div className={styles.top}>
         <div>
-          {HeaderTitleData.map((item) => (
+          {/* {HeaderTitleData.map((item) => (
             <>
               <span className="headTitleName">{item.name}</span>
               <span
@@ -216,7 +306,7 @@ const Page = () => {
                 {statInfo[item.value] ?? '00.00'} 元
               </span>
             </>
-          ))}
+          ))} */}
         </div>
         <div>
           <Form layout="inline" form={searchForm} onFinish={onSearchFun}>
@@ -280,12 +370,16 @@ const Page = () => {
           title="新增投资项"
           visible={addModalVisible}
           destroyOnClose
+          closable
           maskClosable={false}
           footer={false}
           centered
-          onCancel={() => setAddModalVisible(false)}
+          onCancel={() => {
+            setAddModalVisible(false);
+            addForm.resetFields();
+          }}
         >
-          <Form layout="vertical" form={addForm} onFinish={addFormFinish}>
+          <Form name="addform" layout="vertical" form={addForm} onFinish={addFormFinish}>
             <Form.Item label="投资类型" name="investType" required>
               <Select placeholder="请选择投资类型">
                 {Object.keys(InvestType).map((item) => (
@@ -304,6 +398,9 @@ const Page = () => {
             <Form.Item label="买入成本" name="buyCost" required>
               <Input placeholder="买入成本" />
             </Form.Item>
+            <Form.Item label="买入数量" name="buyNum" required>
+              <Input placeholder="买入数量" />
+            </Form.Item>
             <Form.Item label="投资金额" name="totalMoney" required>
               <Input placeholder="投资金额" />
             </Form.Item>
@@ -317,22 +414,26 @@ const Page = () => {
       ) : null}
       {updateModalVisible ? (
         <Modal
-          title="交易操作"
+          title={`交易操作 —（${curRecord.investName}）`}
           visible={updateModalVisible}
           maskClosable={false}
           destroyOnClose
+          closable
           footer={false}
           centered
-          onCancel={() => setUpdateModalVisible(false)}
+          onCancel={() => {
+            setUpdateModalVisible(false);
+            updateForm.resetFields();
+          }}
         >
-          <Form form={updateForm}>
+          <Form name="updateform" form={updateForm} {...formLayouts} onFinish={updateFormFinish}>
             <div className={styles.beforeOpt}>
-              （当前成本：<span>{curRecord?.buyCost ?? '/'}</span>当前总投资：
-              <span>{curRecord?.totalMoney ?? '/'}</span>当前盈亏：
-              <span>{curRecord?.profit ?? '/'}</span>）
+              当前成本：<span>{curRecord?.buyCost ?? '/'}元</span>投资数量：
+              <span>{curRecord?.buyNum ?? '/'}手</span>当前总投资：
+              <span>{curRecord?.totalMoney ?? '/'}元</span>
             </div>
-            <Form.Item label="交易操作" name="investOpt" required>
-              <Radio.Group defaultValue="1">
+            <Form.Item label="交易操作" name="investOpt" required initialValue="1">
+              <Radio.Group>
                 {Object.keys(InvestOpt).map((item) => (
                   <Radio.Button value={item}>{InvestOpt[item]}</Radio.Button>
                 ))}
@@ -342,17 +443,21 @@ const Page = () => {
               <DatePicker style={{ width: '100%' }} />
             </Form.Item>
             <Form.Item label="交易价" name="investCost" required>
-              <Input placeholder="(加/减)价位" />
+              <Input placeholder="(加/减)价位" onChange={(ev) => handleInvestCostChange(ev)} />
             </Form.Item>
             <Form.Item label="交易量" name="investNum" required>
               <Input
                 placeholder="(加/减)多少手 -- 最低100手"
                 suffix="手"
-                onChange={(val) => handleInvestNumChange(val)}
+                onChange={(ev) => handleInvestNumChange(ev)}
               />
             </Form.Item>
             <div className={styles.afterOpt}>
-              （更新成本：<span></span>更新总投资：<span></span>更新盈亏：<span></span>）
+              更新成本：<span>{latestInfo?.latestCost ?? '/'}元</span>更新总投资：
+              <span>{latestInfo?.totalMoney ?? '/'}元</span>盈亏：
+              <span className={`${latestInfo?.profit > 0 ? 'redCls' : 'greenCls'}`}>
+                {latestInfo?.profit ?? '/'}元
+              </span>
             </div>
             <Form.Item>
               <Button htmlType="submit" type="primary">
