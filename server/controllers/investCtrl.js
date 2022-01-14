@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2022-01-10 15:45:22
- * @LastEditTime: 2022-01-12 16:56:02
+ * @LastEditTime: 2022-01-14 10:44:39
  * @LastEditors: Vincent
  * @Description:
  */
@@ -19,7 +19,7 @@ const { setResponseBody } = require('../utils/utils');
  * @return {*}
  */
 const addInvestItemCtrl = async (ctx) => {
-  const { investType, investName, buyTime, buyCost, totalMoney } = ctx.request.body;
+  const { investType, investName, buyTime, buyCost, totalMoney, buyNum } = ctx.request.body;
   try {
     const result = await addInvestItemModel({
       investType,
@@ -27,6 +27,7 @@ const addInvestItemCtrl = async (ctx) => {
       buyTime,
       buyCost,
       totalMoney,
+      buyNum,
     });
     if (result && result.id) {
       ctx.body = setResponseBody({});
@@ -91,7 +92,7 @@ const deleteInvestItemByIdCtrl = async (ctx) => {
 };
 
 const addInvestRecordCtrl = async (ctx) => {
-  const { id, date, investOpt, investCost, investNum, latestCost, totalMoney, profit } =
+  const { id, date, investOpt, investCost, investNum, latestCost, totalMoney, profit, buyNum } =
     ctx.request.body;
   try {
     const result = await addInvestRecordModel({
@@ -103,6 +104,7 @@ const addInvestRecordCtrl = async (ctx) => {
       latestCost,
       totalMoney,
       profit,
+      buyNum,
     });
     if (result) {
       ctx.body = setResponseBody();

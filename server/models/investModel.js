@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2022-01-10 15:45:58
- * @LastEditTime: 2022-01-12 16:56:11
+ * @LastEditTime: 2022-01-14 15:05:59
  * @LastEditors: Vincent
  * @Description:
  */
@@ -42,6 +42,7 @@ const getInvestListByOptionsModel = async (data) => {
     limit: pageSize,
     offset: (currentPage - 1) * pageSize,
   });
+  // let
   if (result && result.rows.length > 0) {
     const itemIds = [];
     result.rows.forEach((item) => itemIds.push(`'${item.id}'`));
@@ -83,7 +84,8 @@ const deleteInvestItemByIdModel = async (id) => {
  * @return {*}
  */
 const addInvestRecordModel = async (data) => {
-  const { id, date, investOpt, investCost, investNum, latestCost, totalMoney, profit } = data;
+  const { id, date, investOpt, investCost, investNum, latestCost, totalMoney, profit, buyNum } =
+    data;
   let isDone = false;
   //   插入新的投资操作记录
   const recordId = UUID.v1();
@@ -108,6 +110,7 @@ const addInvestRecordModel = async (data) => {
         totalMoney,
         profit,
         buyCost: latestCost,
+        buyNum: buyNum,
       },
       {
         where: {

@@ -22,6 +22,11 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       comment: "买入时间"
     },
+    buyNum: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      allowNull: false,
+      comment: "买入数量"
+    },
     buyCost: {
       type: DataTypes.DOUBLE(13,3),
       allowNull: false,
@@ -46,6 +51,11 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.DOUBLE(14,4),
       allowNull: true,
       comment: "盈亏"
+    },
+    status: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      comment: "投资状态：1-进行中 0-已结束"
     }
   }, {
     sequelize,
