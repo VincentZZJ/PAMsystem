@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2021-12-06 10:50:51
- * @LastEditTime: 2022-01-08 16:14:31
+ * @LastEditTime: 2022-01-15 16:09:14
  * @LastEditors: Vincent
  * @Description:
  */
@@ -78,14 +78,14 @@ export default [
       {
         path: '/welcome',
         name: '欢迎页',
-        icon: 'icon-duomeiti',
+        icon: 'icon-shouye',
         component: './Welcome',
         isRoutes: true,
       },
       {
         path: '/financial',
         name: '投资管理',
-        icon: 'icon-asset',
+        icon: 'icon-touzi',
         isRoutes: true,
         routes: [
           {
@@ -95,13 +95,13 @@ export default [
           {
             path: '/financial/overview',
             name: '投资概览',
-            icon: 'icon-analysis',
+            icon: 'icon-touzi1',
             component: './financial/OverView',
           },
           {
             path: '/financial/investlist',
             name: '投资清单',
-            icon: 'icon-project-overview',
+            icon: 'icon-touzishijian',
             component: './financial/InvestList',
           },
         ],

@@ -19,6 +19,7 @@ import {
   deleteInvestItemService,
   updateInvestService,
 } from '@/services/pamsystem/investmng';
+import IconFont from '@/components/IconFont';
 import { InvestType, InvestOpt } from '@/utils/constant';
 
 const { MonthPicker } = DatePicker;
@@ -68,12 +69,16 @@ const Page = () => {
       dataIndex: 'buyTime',
     },
     {
-      title: '持仓',
-      dataIndex: 'buyNum',
+      title: '买入价格',
+      dataIndex: 'buyPrice',
+    },
+    {
+      title: '持仓(手)',
+      dataIndex: 'position',
     },
     {
       title: '成本',
-      dataIndex: 'buyCost',
+      dataIndex: 'cost',
     },
     {
       title: '投资金额',
@@ -90,7 +95,7 @@ const Page = () => {
     },
     {
       title: '卖出价格',
-      dataIndex: 'sellCost',
+      dataIndex: 'sellPrice',
       render: (text) => text || '/',
     },
     {
@@ -102,7 +107,8 @@ const Page = () => {
       title: '盈亏率',
       render: (text, record) => {
         const { totalMoney, profit } = record;
-        const rate = (parseFloat(profit / totalMoney) * 100).toFixed(2);
+        const totalInvest = totalMoney - profit;
+        const rate = (parseFloat(profit / totalInvest) * 100).toFixed(2);
         return <span className={`${profit > 0 ? 'redCls' : 'greenCls'}`}>{`${rate}%`}</span>;
       },
     },
@@ -136,7 +142,23 @@ const Page = () => {
       {
         title: '操作类型',
         dataIndex: 'investOpt',
-        render: (text) => (text ? InvestOpt[text] : '/'),
+        render: (text) => (
+          <span
+            style={{
+              padding: '0.2rem 0.5rem',
+              borderRadius: '0.2rem',
+              fontWeight: 'bold',
+              color: `${text === '1' ? 'red' : 'green'}`,
+              // color: '#fff',
+            }}
+          >
+            <IconFont
+              style={{ fontSize: '1rem', marginRight: '0.5rem' }}
+              type={text === '1' ? 'icon-jiacang' : 'icon-jiancang'}
+            />
+            {InvestOpt[text]}
+          </span>
+        ),
       },
       { title: '成交价格', dataIndex: 'investCost' },
       { title: '成交数量', dataIndex: 'investNum' },
@@ -189,7 +211,7 @@ const Page = () => {
     const params = {};
     Object.keys(val).forEach((item) => {
       if (val[item]) {
-        params[item] = val[item];
+        params[item] = item === 'buyTime' ? val[item].format('YYYY-MM') : val[item];
       }
     });
     setSearchParams(params);
@@ -226,26 +248,26 @@ const Page = () => {
 
   const updateLatestInfo = (investCost, investNum) => {
     const optType = updateForm.getFieldValue('investOpt');
-    const { totalMoney, buyNum, buyCost } = curRecord;
-    let money = totalMoney;
-    let num = buyNum;
+    const { totalInvest, position, totalMoney, cost } = curRecord;
+    let investMoney = totalInvest;
+    let num = position;
     if (optType === '1') {
       // 加仓
-      money = money + investCost * investNum;
-      num = buyNum + investNum;
+      investMoney = investMoney + investCost * investNum;
+      num = position + investNum;
     } else if (optType === '2') {
       // 减仓
-      money = money - investCost * investNum;
-      num = buyNum - investNum;
-    } else {
-      // 清仓
-      money = 0;
+      num = position - investNum;
+      investMoney = num ? investMoney - investCost * investNum : 0;
     }
-    const profit = buyNum * (investCost - buyCost);
-    const latestCost = parseFloat(money / num);
+    const profit = position * (investCost - cost);
+    const latestCost = num ? parseFloat(investMoney / num) : 0;
+    const latestMoney = totalMoney + profit;
+    // const profit = latestMoney - investMoney;
     setLatestInfo({
-      totalMoney: money,
-      buyNum: num,
+      totalInvest: investMoney,
+      totalMoney: latestMoney,
+      position: num,
       latestCost,
       profit,
     });
@@ -297,6 +319,7 @@ const Page = () => {
     <div className={styles.wrap}>
       <div className={styles.top}>
         <div>
+          <span style={{ fontWeight: 'bold', fontSize: '1rem' }}>（金额单位：元）</span>
           {/* {HeaderTitleData.map((item) => (
             <>
               <span className="headTitleName">{item.name}</span>
@@ -313,7 +336,7 @@ const Page = () => {
             <Form.Item name="investName">
               <Input className="inputWidth" placeholder="请输入投资项名称" />
             </Form.Item>
-            <Form.Item name="time">
+            <Form.Item name="buyTime">
               <MonthPicker className="inputWidth" />
             </Form.Item>
             <Form.Item name="investType" initialValue="">
@@ -395,13 +418,13 @@ const Page = () => {
             <Form.Item label="买入时间" name="buyTime" required>
               <DatePicker style={{ width: '100%' }} />
             </Form.Item>
-            <Form.Item label="买入成本" name="buyCost" required>
-              <Input placeholder="买入成本" />
+            <Form.Item label="买入价格" name="buyPrice" required>
+              <Input placeholder="买入价格" />
             </Form.Item>
-            <Form.Item label="买入数量" name="buyNum" required>
-              <Input placeholder="买入数量" />
+            <Form.Item label="持仓" name="position" required>
+              <Input placeholder="持仓(最低100手)" suffix="手" />
             </Form.Item>
-            <Form.Item label="投资金额" name="totalMoney" required>
+            <Form.Item label="投资金额" name="totalInvest" required>
               <Input placeholder="投资金额" />
             </Form.Item>
             <Form.Item>
@@ -428,9 +451,9 @@ const Page = () => {
         >
           <Form name="updateform" form={updateForm} {...formLayouts} onFinish={updateFormFinish}>
             <div className={styles.beforeOpt}>
-              当前成本：<span>{curRecord?.buyCost ?? '/'}元</span>投资数量：
-              <span>{curRecord?.buyNum ?? '/'}手</span>当前总投资：
-              <span>{curRecord?.totalMoney ?? '/'}元</span>
+              当前成本：<span>{curRecord?.cost ?? '/'}元</span>持仓：
+              <span>{curRecord?.position ?? '/'}手</span>当前总投资：
+              <span>{curRecord?.totalInvest ?? '/'}元</span>
             </div>
             <Form.Item label="交易操作" name="investOpt" required initialValue="1">
               <Radio.Group>
@@ -454,7 +477,7 @@ const Page = () => {
             </Form.Item>
             <div className={styles.afterOpt}>
               更新成本：<span>{latestInfo?.latestCost ?? '/'}元</span>更新总投资：
-              <span>{latestInfo?.totalMoney ?? '/'}元</span>盈亏：
+              <span>{latestInfo?.totalInvest ?? '/'}元</span>盈亏：
               <span className={`${latestInfo?.profit > 0 ? 'redCls' : 'greenCls'}`}>
                 {latestInfo?.profit ?? '/'}元
               </span>

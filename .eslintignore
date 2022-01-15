@@ -6,6 +6,4 @@ public
 dist
 .umi
 mock
-/server
 app.js
-/src

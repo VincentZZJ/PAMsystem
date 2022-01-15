@@ -26,14 +26,21 @@ const BasicLayout = (props) => {
       return menu.map((item) => {
         if (item?.routes?.length > 0) {
           return (
-            <SubMenu key={item.path} title={item.name} icon={<IconFont type={item.icon} />}>
+            <SubMenu
+              key={item.path}
+              title={item.name}
+              icon={<IconFont style={{ fontSize: '1rem' }} type={item.icon} />}
+            >
               {renderMenu(item.routes)};
             </SubMenu>
           );
         }
         if (item.icon) {
           return (
-            <Menu.Item key={item.path} icon={<IconFont type={item.icon} />}>
+            <Menu.Item
+              key={item.path}
+              icon={<IconFont style={{ fontSize: '1rem' }} type={item.icon} />}
+            >
               {item.name}
             </Menu.Item>
           );
