@@ -22,17 +22,27 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       comment: "买入时间"
     },
-    buyNum: {
-      type: DataTypes.INTEGER.UNSIGNED,
-      allowNull: false,
-      comment: "买入数量"
-    },
-    buyCost: {
+    buyPrice: {
       type: DataTypes.DOUBLE(13,3),
       allowNull: false,
-      comment: "买入成本"
+      comment: "买入价格"
+    },
+    position: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      allowNull: false,
+      comment: "持仓"
+    },
+    cost: {
+      type: DataTypes.DOUBLE(13,3),
+      allowNull: false,
+      comment: "成本"
     },
     totalMoney: {
+      type: DataTypes.DOUBLE(14,4),
+      allowNull: false,
+      comment: "市值"
+    },
+    totalInvest: {
       type: DataTypes.DOUBLE(14,4),
       allowNull: false,
       comment: "投资金额"
@@ -42,7 +52,7 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true,
       comment: "卖出时间"
     },
-    sellCost: {
+    sellPrice: {
       type: DataTypes.DOUBLE(13,3),
       allowNull: true,
       comment: "卖出价格"

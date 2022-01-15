@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2022-01-10 15:45:58
- * @LastEditTime: 2022-01-14 15:05:59
+ * @LastEditTime: 2022-01-15 17:01:02
  * @LastEditors: Vincent
  * @Description:
  */
@@ -84,8 +84,18 @@ const deleteInvestItemByIdModel = async (id) => {
  * @return {*}
  */
 const addInvestRecordModel = async (data) => {
-  const { id, date, investOpt, investCost, investNum, latestCost, totalMoney, profit, buyNum } =
-    data;
+  const {
+    id,
+    date,
+    investOpt,
+    investCost,
+    investNum,
+    latestCost,
+    totalMoney,
+    profit,
+    position,
+    totalInvest,
+  } = data;
   let isDone = false;
   //   插入新的投资操作记录
   const recordId = UUID.v1();
@@ -105,12 +115,20 @@ const addInvestRecordModel = async (data) => {
       recordId: recordId,
     });
     // 更新投资项的数据
+    const otherOpt = {};
+    if (totalInvest === '0') {
+      otherOpt.status = '0';
+      otherOpt.sellTime = date;
+      otherOpt.sellPrice = investCost;
+    }
     await InvestItem.update(
       {
         totalMoney,
+        totalInvest,
         profit,
-        buyCost: latestCost,
-        buyNum: buyNum,
+        cost: latestCost,
+        position,
+        ...otherOpt,
       },
       {
         where: {
