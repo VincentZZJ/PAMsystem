@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2022-01-10 15:45:58
- * @LastEditTime: 2022-01-15 17:01:02
+ * @LastEditTime: 2022-01-18 15:52:19
  * @LastEditors: Vincent
  * @Description:
  */
@@ -21,6 +21,8 @@ const addInvestItemModel = async (data) => {
   const isAdd = await InvestItem.create({
     id: UUID.v1(),
     ...data,
+    status: 1,
+    isDel: 0,
   });
   return isAdd && isAdd.dataValues;
 };
@@ -37,6 +39,7 @@ const getInvestListByOptionsModel = async (data) => {
   const result = await InvestItem.findAndCountAll({
     where: {
       ...params,
+      isDel: 0,
     },
     raw: true,
     limit: pageSize,
@@ -45,12 +48,18 @@ const getInvestListByOptionsModel = async (data) => {
   // let
   if (result && result.rows.length > 0) {
     const itemIds = [];
+    let cumulativeProfit = 0; // 累计盈亏
+    let allInvest = 0; // 在投项目的总投资
     result.rows.forEach((item) => itemIds.push(`'${item.id}'`));
     const recordList = await PamDatabase.query(
       `select * from invest_record as a INNER join invest_history as b ON a.id = b.recordId where b.itemId in (${itemIds.toString()})`,
     );
     if (recordList && recordList.length > 0) {
       result.rows.forEach((item) => {
+        cumulativeProfit += parseFloat(item.profit);
+        if (item.status) {
+          allInvest += parseFloat(item.totalInvest);
+        }
         const optRecords = [];
         recordList[0].forEach((a) => {
           if (a.itemId === item.id) {
@@ -60,6 +69,10 @@ const getInvestListByOptionsModel = async (data) => {
         item.optHistory = optRecords;
       });
     }
+    result.statObj = {
+      cumulativeProfit,
+      allInvest,
+    };
   }
   return result;
 };
@@ -70,11 +83,16 @@ const getInvestListByOptionsModel = async (data) => {
  * @return {*}
  */
 const deleteInvestItemByIdModel = async (id) => {
-  const result = await InvestItem.destroy({
-    where: {
-      id: id,
+  const result = await InvestItem.update(
+    {
+      isDel: 1,
     },
-  });
+    {
+      where: {
+        id: id,
+      },
+    },
+  );
   return result;
 };
 
@@ -117,7 +135,7 @@ const addInvestRecordModel = async (data) => {
     // 更新投资项的数据
     const otherOpt = {};
     if (totalInvest === '0') {
-      otherOpt.status = '0';
+      otherOpt.status = 0;
       otherOpt.sellTime = date;
       otherOpt.sellPrice = investCost;
     }
@@ -141,9 +159,28 @@ const addInvestRecordModel = async (data) => {
   return isDone;
 };
 
+const updateLatestPriceModel = async (data) => {
+  const { id, latestPrice, latestDate, profit, totalMoney } = data;
+  const isUpdate = await InvestItem.update(
+    {
+      latestPrice,
+      latestDate,
+      profit,
+      totalMoney,
+    },
+    {
+      where: {
+        id: id,
+      },
+    },
+  );
+  return isUpdate;
+};
+
 module.exports = {
   addInvestItemModel,
   getInvestListByOptionsModel,
   deleteInvestItemByIdModel,
   addInvestRecordModel,
+  updateLatestPriceModel,
 };

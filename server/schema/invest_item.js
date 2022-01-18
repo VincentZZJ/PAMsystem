@@ -66,6 +66,26 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.INTEGER,
       allowNull: false,
       comment: "投资状态：1-进行中 0-已结束"
+    },
+    code: {
+      type: DataTypes.STRING(20),
+      allowNull: false,
+      comment: "投资标的的编号：sz001001;sh600789"
+    },
+    latestPrice: {
+      type: DataTypes.DOUBLE(13,3),
+      allowNull: true,
+      comment: "现价"
+    },
+    latestDate: {
+      type: DataTypes.DATEONLY,
+      allowNull: true,
+      comment: "现价时间"
+    },
+    isDel: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      comment: "是否删除：1-已删除；0-未删除"
     }
   }, {
     sequelize,

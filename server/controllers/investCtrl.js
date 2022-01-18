@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2022-01-10 15:45:22
- * @LastEditTime: 2022-01-15 15:21:40
+ * @LastEditTime: 2022-01-17 16:13:56
  * @LastEditors: Vincent
  * @Description:
  */
@@ -10,7 +10,9 @@ const {
   getInvestListByOptionsModel,
   deleteInvestItemByIdModel,
   addInvestRecordModel,
+  updateLatestPriceModel,
 } = require('../models/investModel');
+const Koa2Req = require('koa2-request');
 const { setResponseBody } = require('../utils/utils');
 
 /**
@@ -19,7 +21,8 @@ const { setResponseBody } = require('../utils/utils');
  * @return {*}
  */
 const addInvestItemCtrl = async (ctx) => {
-  const { investType, investName, buyTime, buyPrice, totalInvest, position } = ctx.request.body;
+  const { investType, investName, buyTime, buyPrice, totalInvest, position, code } =
+    ctx.request.body;
   try {
     const result = await addInvestItemModel({
       investType,
@@ -30,7 +33,7 @@ const addInvestItemCtrl = async (ctx) => {
       totalInvest,
       position,
       cost: buyPrice,
-      status: 1,
+      code,
     });
     if (result && result.id) {
       ctx.body = setResponseBody({});
@@ -94,6 +97,11 @@ const deleteInvestItemByIdCtrl = async (ctx) => {
   }
 };
 
+/**
+ * @description: 新增投资操作记录
+ * @param {*} ctx
+ * @return {*}
+ */
 const addInvestRecordCtrl = async (ctx) => {
   const {
     id,
@@ -130,9 +138,44 @@ const addInvestRecordCtrl = async (ctx) => {
   }
 };
 
+/**
+ * @description: 更新单价
+ * @param {*} ctx
+ * @return {*}
+ */
+const updateLatestPriceCtrl = async (ctx) => {
+  const { id, code, cost, position } = ctx.request.query;
+  try {
+    const latestRes = await Koa2Req(`http://hq.sinajs.cn/list=${code}`);
+    if (latestRes.body) {
+      const latestInfo = latestRes.body.split('=')[1].split(',');
+      const latestPrice = parseFloat(latestInfo[3]);
+      const profit = (latestPrice - parseFloat(cost)) * parseInt(position);
+      const totalMoney = latestPrice * parseInt(position);
+      const result = await updateLatestPriceModel({
+        id,
+        latestPrice: latestInfo[3],
+        latestDate: new Date().valueOf(),
+        profit,
+        totalMoney,
+      });
+      if (result) {
+        ctx.body = setResponseBody();
+      } else {
+        ctx.body = setResponseBody({}, '-1', '操作出错');
+      }
+    } else {
+      ctx.body = setResponseBody({}, '-1', '获取最新价格出错');
+    }
+  } catch (e) {
+    ctx.body = setResponseBody(e, '-1', '服务出错');
+  }
+};
+
 module.exports = {
   addInvestItemCtrl,
   getInvestListByOptionsCtrl,
   deleteInvestItemByIdCtrl,
   addInvestRecordCtrl,
+  updateLatestPriceCtrl,
 };

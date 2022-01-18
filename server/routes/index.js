@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2021-12-07 14:12:16
- * @LastEditTime: 2022-01-12 11:02:35
+ * @LastEditTime: 2022-01-17 14:55:00
  * @LastEditors: Vincent
  * @Description: 接口映射
  */
@@ -42,5 +42,8 @@ router.delete('/investmng/deleteInvestItemById', investCtrl.deleteInvestItemById
 
 // 更新投资项
 router.post('/investmng/addInvestRecord', investCtrl.addInvestRecordCtrl);
+
+// 更新现价
+router.get('/investmng/getLatestPriceByCode', investCtrl.updateLatestPriceCtrl);
 
 module.exports = router;
