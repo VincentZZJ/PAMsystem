@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2022-01-10 15:45:58
- * @LastEditTime: 2022-01-18 15:52:19
+ * @LastEditTime: 2022-01-18 17:03:56
  * @LastEditors: Vincent
  * @Description:
  */
@@ -45,7 +45,6 @@ const getInvestListByOptionsModel = async (data) => {
     limit: pageSize,
     offset: (currentPage - 1) * pageSize,
   });
-  // let
   if (result && result.rows.length > 0) {
     const itemIds = [];
     let cumulativeProfit = 0; // 累计盈亏

@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2022-01-10 15:45:22
- * @LastEditTime: 2022-01-17 16:13:56
+ * @LastEditTime: 2022-01-18 17:18:33
  * @LastEditors: Vincent
  * @Description:
  */
@@ -21,7 +21,7 @@ const { setResponseBody } = require('../utils/utils');
  * @return {*}
  */
 const addInvestItemCtrl = async (ctx) => {
-  const { investType, investName, buyTime, buyPrice, totalInvest, position, code } =
+  const { investType, investName, buyTime, buyPrice, totalInvest, position, code, userid } =
     ctx.request.body;
   try {
     const result = await addInvestItemModel({
@@ -34,6 +34,7 @@ const addInvestItemCtrl = async (ctx) => {
       position,
       cost: buyPrice,
       code,
+      userid,
     });
     if (result && result.id) {
       ctx.body = setResponseBody({});
@@ -51,7 +52,7 @@ const addInvestItemCtrl = async (ctx) => {
  * @return {*}
  */
 const getInvestListByOptionsCtrl = async (ctx) => {
-  const searchDict = ['investName', 'buyTime', 'investType'];
+  const searchDict = ['investName', 'buyTime', 'investType', 'userid'];
   const { currentPage, pageSize, ...data } = ctx.request.query;
   const params = {};
   Object.keys(data).forEach((item) => {
@@ -60,7 +61,7 @@ const getInvestListByOptionsCtrl = async (ctx) => {
     }
   });
   try {
-    if (currentPage && pageSize) {
+    if (params.userid && currentPage && pageSize) {
       const result = await getInvestListByOptionsModel({
         params,
         pagination: { currentPage, pageSize },
@@ -71,7 +72,7 @@ const getInvestListByOptionsCtrl = async (ctx) => {
         ctx.body = setResponseBody({}, '-1', result.desc);
       }
     } else {
-      ctx.body = setResponseBody({}, '-1', '请求参数有误，丢失页码信息');
+      ctx.body = setResponseBody({}, '-1', '请求参数有误');
     }
   } catch (e) {
     ctx.body = setResponseBody(e, '-1', '服务出错');

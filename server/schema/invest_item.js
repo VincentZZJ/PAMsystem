@@ -86,6 +86,11 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.INTEGER,
       allowNull: false,
       comment: "是否删除：1-已删除；0-未删除"
+    },
+    userid: {
+      type: DataTypes.STRING(64),
+      allowNull: false,
+      comment: "用户id"
     }
   }, {
     sequelize,

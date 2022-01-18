@@ -24,6 +24,7 @@ import {
   updatePriceByCodeService,
 } from '@/services/pamsystem/investmng';
 import IconFont from '@/components/IconFont';
+import { useModel, history } from 'umi';
 import { InvestType, InvestOpt } from '@/utils/constant';
 import { formatMoney } from '@/utils/utils';
 
@@ -44,6 +45,7 @@ const Page = () => {
   const [updateModalVisible, setUpdateModalVisible] = useState(false);
   const [isRefresh, setIsRefresh] = useState('');
   const [curRecord, setCurRecord] = useState({});
+  const { initialState } = useModel('@@initialState');
 
   const columns = [
     {
@@ -275,8 +277,14 @@ const Page = () => {
   const addFormFinish = async (val) => {
     const { buyTime } = val;
     const params = { ...val, buyTime: buyTime.format('YYYY-MM-DD') };
+    const { currentUser = {} } = initialState;
+    if (!currentUser.userId) {
+      message.error('用户登录失效，请重新登录');
+      history.push('/usercenter/login');
+      return;
+    }
     try {
-      const response = await addInvestService({ ...params });
+      const response = await addInvestService({ ...params, userid: currentUser.userId });
       if (response && response.code === '0') {
         message.success('新增成功');
         setAddModalVisible(false);
@@ -419,8 +427,10 @@ const Page = () => {
         console.log(e);
       }
     };
-    fetchInvestList({ ...searchParams, ...pagination });
-  }, [searchParams, pagination, isRefresh]);
+    if (initialState?.currentUser?.userId) {
+      fetchInvestList({ ...searchParams, ...pagination, userid: initialState.currentUser.userId });
+    }
+  }, [searchParams, pagination, isRefresh, initialState]);
 
   return (
     <div className={styles.wrap}>
