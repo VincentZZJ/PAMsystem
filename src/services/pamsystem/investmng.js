@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2022-01-11 15:41:54
- * @LastEditTime: 2022-01-14 11:29:10
+ * @LastEditTime: 2022-01-17 15:04:11
  * @LastEditors: Vincent
  * @Description:
  */
@@ -37,4 +37,9 @@ export async function updateInvestService(data) {
     requestType: 'form',
     data,
   });
+}
+
+// 获取最新价格
+export async function updatePriceByCodeService(data) {
+  return request(`/pamsystem/investmng/getLatestPriceByCode?${Stringify(data)}`);
 }

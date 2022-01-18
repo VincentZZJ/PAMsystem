@@ -10,17 +10,22 @@ import {
   Modal,
   Radio,
   message,
+  Tooltip,
+  Popconfirm,
+  Popover,
 } from 'antd';
-import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
+import { SearchOutlined, PlusOutlined, ReloadOutlined, SyncOutlined } from '@ant-design/icons';
 import styles from './index.less';
 import {
   getInvestListByOptService,
   addInvestService,
   deleteInvestItemService,
   updateInvestService,
+  updatePriceByCodeService,
 } from '@/services/pamsystem/investmng';
 import IconFont from '@/components/IconFont';
 import { InvestType, InvestOpt } from '@/utils/constant';
+import { formatMoney } from '@/utils/utils';
 
 const { MonthPicker } = DatePicker;
 const { Option } = Select;
@@ -63,30 +68,35 @@ const Page = () => {
     {
       title: '名称',
       dataIndex: 'investName',
+      render: (text, record) => `${text}(${record?.code})`,
     },
     {
       title: '买入时间',
       dataIndex: 'buyTime',
     },
     {
-      title: '买入价格',
+      title: '买入价格(元)',
       dataIndex: 'buyPrice',
+      render: (text) => formatMoney(text),
     },
     {
       title: '持仓(手)',
       dataIndex: 'position',
     },
     {
-      title: '成本',
+      title: '成本(元)',
       dataIndex: 'cost',
+      render: (text) => formatMoney(text),
     },
     {
-      title: '投资金额',
+      title: '投资金额(元)',
       dataIndex: 'totalInvest',
+      render: (text) => formatMoney(text, 3),
     },
     {
-      title: '市值',
+      title: '市值(元)',
       dataIndex: 'totalMoney',
+      render: (text) => formatMoney(text, 3),
     },
     {
       title: '卖出时间',
@@ -94,14 +104,45 @@ const Page = () => {
       render: (text) => text || '/',
     },
     {
-      title: '卖出价格',
+      title: '卖出价格(元)',
       dataIndex: 'sellPrice',
-      render: (text) => text || '/',
+      render: (text) => formatMoney(text),
     },
     {
-      title: '盈亏',
+      title: () => (
+        <span>
+          盈亏(元)
+          <Tooltip title="批量更新" placement="top">
+            <SyncOutlined
+              style={{ color: '#000', marginLeft: '0.4rem' }}
+              onClick={(e) => {
+                e.stopPropagation();
+                batchUpdateItemPrice();
+              }}
+            />
+          </Tooltip>
+        </span>
+      ),
       dataIndex: 'profit',
-      render: (text) => <span className={`${text > 0 ? 'redCls' : 'greenCls'}`}>{text ?? 0}</span>,
+      render: (text, record) => (
+        <span className={`${text > 0 ? 'redCls' : 'greenCls'}`}>
+          {formatMoney(text)}
+          <Tooltip
+            title={`更新现价(上次更新-时间:${record?.latestDate ?? 'xxx'}-现价:${
+              record?.latestPrice ?? 'xxx'
+            })`}
+            placement="leftTop"
+          >
+            <SyncOutlined
+              style={{ color: '#000', marginLeft: '0.4rem' }}
+              onClick={(e) => {
+                e.stopPropagation();
+                updateItemPrice(record);
+              }}
+            />
+          </Tooltip>
+        </span>
+      ),
     },
     {
       title: '盈亏率',
@@ -117,13 +158,26 @@ const Page = () => {
       render: (text, record) => {
         return (
           <>
-            <span className="linkCls" onClick={() => handleUpdateOpt(record)}>
+            <span
+              className="linkCls"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleUpdateOpt(record);
+              }}
+            >
               更新
             </span>
             <Divider type="vertical" />
-            <span className="linkCls" onClick={() => handleDelInvestItem(record.id)}>
-              删除
-            </span>
+            <Popconfirm title="确定删除吗？" onConfirm={() => handleDelInvestItem(record.id)}>
+              <span
+                className="linkCls"
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+              >
+                删除
+              </span>
+            </Popconfirm>
           </>
         );
       },
@@ -165,6 +219,56 @@ const Page = () => {
       { title: '成交后成本', dataIndex: 'latestCost' },
     ];
     return <Table pagination={false} columns={columns} dataSource={record?.optHistory ?? []} />;
+  };
+
+  // 更新现价
+  const batchUpdateItemPrice = () => {
+    if (investList && investList.length > 0) {
+      const promiseArray = [];
+      investList.forEach((item) => {
+        const { code, id, cost, position, status } = item;
+        if (status) {
+          const itemPromise = new Promise(async (resolve, reject) => {
+            try {
+              await updatePriceByCodeService({ code, id, cost, position });
+              resolve();
+            } catch (e) {
+              console.log(e);
+              reject(e);
+            }
+          });
+          promiseArray.push(itemPromise);
+        }
+      });
+      Promise.all(promiseArray)
+        .then(() => {
+          setIsRefresh(new Date().valueOf());
+          message.success('更新成功');
+        })
+        .catch((err) => {
+          message.error('更新失败');
+          console.log(err);
+        });
+    }
+  };
+
+  const updateItemPrice = async (record) => {
+    const { code, id, cost, position, status } = record;
+    if (!status) {
+      message.error('投资已结束');
+      return;
+    }
+    try {
+      const result = await updatePriceByCodeService({ code, id, cost, position });
+      if (result && result.code === '0') {
+        message.success('更新成功');
+        setIsRefresh(new Date().valueOf());
+      } else {
+        message.error(result?.desc || '数据更新出错');
+      }
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   // 新增表单
@@ -302,12 +406,15 @@ const Page = () => {
         const response = await getInvestListByOptService(data);
         let list = [];
         let total = 0;
+        let statObj = {};
         if (response && response.code === '0' && response.msg) {
           list = response.msg?.rows ?? [];
           total = response.msg?.count ?? 0;
+          statObj = response.msg?.statObj ?? {};
         }
         setRecordsTotal(total);
         setInvestList(list);
+        setStatInfo(statObj);
       } catch (e) {
         console.log(e);
       }
@@ -320,6 +427,26 @@ const Page = () => {
       <div className={styles.top}>
         <div>
           <span style={{ fontWeight: 'bold', fontSize: '1rem' }}>（金额单位：元）</span>
+          <Popover
+            title="投资概览"
+            content={
+              <>
+                <p>
+                  当前总投资：
+                  <span style={{ fontWeight: 'bold' }}>{formatMoney(statInfo.allInvest, 3)}元</span>
+                </p>
+                <p>
+                  累计总盈亏：
+                  <span className={statInfo?.cumulativeProfit > 0 ? 'redCls' : 'greenCls'}>
+                    {formatMoney(statInfo.cumulativeProfit, 3)}元
+                  </span>
+                </p>
+              </>
+            }
+            placement="rightBottom"
+          >
+            <IconFont type="icon-caiwutouzi" style={{ fontSize: '1.25rem', cursor: 'pointer' }} />
+          </Popover>
           {/* {HeaderTitleData.map((item) => (
             <>
               <span className="headTitleName">{item.name}</span>
@@ -373,6 +500,7 @@ const Page = () => {
             expandedRowRender,
             rowExpandable: (record) => record?.optHistory?.length > 0,
           }}
+          rowKey={(record) => record.id}
           pagination={{
             showSizeChanger: true,
             showQuickJumper: false,
@@ -411,6 +539,9 @@ const Page = () => {
                   </Option>
                 ))}
               </Select>
+            </Form.Item>
+            <Form.Item label="代码" name="code" required>
+              <Input placeholder="请输入投资代码(如：sh600789,sz001001)" />
             </Form.Item>
             <Form.Item label="名称" name="investName" required>
               <Input placeholder="请输入名称" />
