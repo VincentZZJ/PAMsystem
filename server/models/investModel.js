@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2022-01-10 15:45:58
- * @LastEditTime: 2022-01-18 17:03:56
+ * @LastEditTime: 2022-01-19 16:31:58
  * @LastEditors: Vincent
  * @Description:
  */
@@ -41,6 +41,10 @@ const getInvestListByOptionsModel = async (data) => {
       ...params,
       isDel: 0,
     },
+    order: [
+      ['status', 'DESC'],
+      ['buyTime', 'DESC'],
+    ],
     raw: true,
     limit: pageSize,
     offset: (currentPage - 1) * pageSize,
