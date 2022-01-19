@@ -3,6 +3,7 @@ import { Form, Input, Button, message } from 'antd';
 import { UserOutlined, LockOutlined, PhoneOutlined } from '@ant-design/icons';
 import { LoginService, RegisterService } from '@/services/pamsystem/usercenter';
 import { useModel, history } from 'umi';
+import { MD5, enc } from 'crypto-js';
 import styles from './index.less';
 
 const Page = () => {
@@ -13,7 +14,10 @@ const Page = () => {
 
   // 登录提交
   const loginFun = async (values) => {
-    const result = await LoginService(values);
+    const result = await LoginService({
+      ...values,
+      password: enc.Base64.stringify(enc.Utf8.parse(MD5(values.password).toString())),
+    });
     if (result && result.code === '0') {
       message.success('登录成功！');
       const { phone, username, userId } = result.msg;
@@ -32,7 +36,12 @@ const Page = () => {
 
   // 注册提交
   const registerFun = async (values) => {
-    const result = await RegisterService(values);
+    const { username, phone, password } = values;
+    const result = await RegisterService({
+      username,
+      phone,
+      password: enc.Base64.stringify(enc.Utf8.parse(MD5(password).toString())),
+    });
     if (result && result.code === '0') {
       message.success('注册成功！');
       const { phone, username, token } = result.msg;

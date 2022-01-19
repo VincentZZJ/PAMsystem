@@ -14,7 +14,7 @@ import {
   Popconfirm,
   Popover,
 } from 'antd';
-import { SearchOutlined, PlusOutlined, ReloadOutlined, SyncOutlined } from '@ant-design/icons';
+import { SearchOutlined, PlusOutlined, InfoCircleOutlined, SyncOutlined } from '@ant-design/icons';
 import styles from './index.less';
 import {
   getInvestListByOptService,
@@ -50,11 +50,13 @@ const Page = () => {
   const columns = [
     {
       title: '序号',
+      width: '4%',
       render: (text, record, index) =>
         (pagination.currentPage - 1) * pagination.pageSize + index + 1,
     },
     {
       title: '状态',
+      width: '6%',
       dataIndex: 'status',
       render: (text) => (
         <span className={`statusTag ${text ? 'isDoingCls' : 'isDoneCls'}`}>
@@ -64,6 +66,7 @@ const Page = () => {
     },
     {
       title: '投资类型',
+      width: '6%',
       dataIndex: 'investType',
       render: (text) => InvestType[text],
     },
@@ -74,6 +77,7 @@ const Page = () => {
     },
     {
       title: '买入时间',
+      width: '7%',
       dataIndex: 'buyTime',
     },
     {
@@ -83,25 +87,40 @@ const Page = () => {
     },
     {
       title: '持仓(手)',
+      width: '6%',
       dataIndex: 'position',
     },
     {
       title: '成本(元)',
+      width: '5%',
       dataIndex: 'cost',
       render: (text) => formatMoney(text),
     },
     {
+      title: '现价(元)',
+      dataIndex: 'latestPrice',
+      render: (text, record) => (
+        <span>
+          {formatMoney(text)}
+          <Tooltip title={`更新时间:${record?.latestDate ?? 'xxx'}`} placement="rightTop">
+            <InfoCircleOutlined style={{ marginLeft: '0.3rem' }} />
+          </Tooltip>
+        </span>
+      ),
+    },
+    {
       title: '投资金额(元)',
       dataIndex: 'totalInvest',
-      render: (text) => formatMoney(text, 3),
+      render: (text) => formatMoney(text),
     },
     {
       title: '市值(元)',
       dataIndex: 'totalMoney',
-      render: (text) => formatMoney(text, 3),
+      render: (text) => formatMoney(text),
     },
     {
       title: '卖出时间',
+      width: '7%',
       dataIndex: 'sellTime',
       render: (text) => text || '/',
     },
@@ -129,7 +148,7 @@ const Page = () => {
       render: (text, record) => (
         <span className={`${text > 0 ? 'redCls' : 'greenCls'}`}>
           {formatMoney(text)}
-          <Tooltip
+          {/* <Tooltip
             title={`更新现价(上次更新-时间:${record?.latestDate ?? 'xxx'}-现价:${
               record?.latestPrice ?? 'xxx'
             })`}
@@ -142,12 +161,13 @@ const Page = () => {
                 updateItemPrice(record);
               }}
             />
-          </Tooltip>
+          </Tooltip> */}
         </span>
       ),
     },
     {
       title: '盈亏率',
+      width: '6%',
       render: (text, record) => {
         const { totalMoney, profit } = record;
         const totalInvest = totalMoney - profit;
@@ -443,12 +463,12 @@ const Page = () => {
               <>
                 <p>
                   当前总投资：
-                  <span style={{ fontWeight: 'bold' }}>{formatMoney(statInfo.allInvest, 3)}元</span>
+                  <span style={{ fontWeight: 'bold' }}>{formatMoney(statInfo.allInvest)}元</span>
                 </p>
                 <p>
                   累计总盈亏：
                   <span className={statInfo?.cumulativeProfit > 0 ? 'redCls' : 'greenCls'}>
-                    {formatMoney(statInfo.cumulativeProfit, 3)}元
+                    {formatMoney(statInfo.cumulativeProfit)}元
                   </span>
                 </p>
               </>
@@ -524,6 +544,7 @@ const Page = () => {
             ),
           }}
           onChange={handleTableChange}
+          scroll={{ y: 700 }}
         />
       </div>
       {addModalVisible ? (
@@ -617,10 +638,10 @@ const Page = () => {
               />
             </Form.Item>
             <div className={styles.afterOpt}>
-              更新成本：<span>{latestInfo?.latestCost ?? '/'}元</span>更新总投资：
-              <span>{latestInfo?.totalInvest ?? '/'}元</span>盈亏：
+              更新成本：<span>{formatMoney(latestInfo?.latestCost)}元</span>更新总投资：
+              <span>{formatMoney(latestInfo?.totalInvest)}元</span>盈亏：
               <span className={`${latestInfo?.profit > 0 ? 'redCls' : 'greenCls'}`}>
-                {latestInfo?.profit ?? '/'}元
+                {formatMoney(latestInfo?.profit)}元
               </span>
             </div>
             <Form.Item>
