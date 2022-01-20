@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2022-01-10 15:45:22
- * @LastEditTime: 2022-01-18 17:18:33
+ * @LastEditTime: 2022-01-20 14:01:00
  * @LastEditors: Vincent
  * @Description:
  */
@@ -104,18 +104,8 @@ const deleteInvestItemByIdCtrl = async (ctx) => {
  * @return {*}
  */
 const addInvestRecordCtrl = async (ctx) => {
-  const {
-    id,
-    date,
-    investOpt,
-    investCost,
-    investNum,
-    latestCost,
-    totalMoney,
-    totalInvest,
-    profit,
-    position,
-  } = ctx.request.body;
+  const { id, date, investOpt, investCost, investNum, latestCost, totalInvest, profit, position } =
+    ctx.request.body;
   try {
     const result = await addInvestRecordModel({
       id,
@@ -124,7 +114,6 @@ const addInvestRecordCtrl = async (ctx) => {
       investCost,
       investNum,
       latestCost,
-      totalMoney,
       profit,
       position,
       totalInvest,

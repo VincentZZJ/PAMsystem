@@ -243,12 +243,13 @@ const Page = () => {
     return <Table pagination={false} columns={columns} dataSource={record?.optHistory ?? []} />;
   };
 
-  // 更新现价
+  // 批量更新现价
   const batchUpdateItemPrice = () => {
     if (investList && investList.length > 0) {
       const promiseArray = [];
       investList.forEach((item) => {
         const { code, id, cost, position, status } = item;
+        // 针对进行中的投资项才更新现价
         if (status) {
           const itemPromise = new Promise(async (resolve, reject) => {
             try {
@@ -274,6 +275,7 @@ const Page = () => {
     }
   };
 
+  // 单个更新现价
   const updateItemPrice = async (record) => {
     const { code, id, cost, position, status } = record;
     if (!status) {
@@ -380,7 +382,7 @@ const Page = () => {
 
   const updateLatestInfo = (investCost, investNum) => {
     const optType = updateForm.getFieldValue('investOpt');
-    const { totalInvest, position, totalMoney, cost } = curRecord;
+    const { totalInvest, position, cost } = curRecord;
     let investMoney = totalInvest;
     let num = position;
     if (optType === '1') {
@@ -394,11 +396,11 @@ const Page = () => {
     }
     const profit = position * (investCost - cost);
     const latestCost = num ? parseFloat(investMoney / num) : 0;
-    const latestMoney = totalMoney + profit;
+    // const latestMoney = totalMoney + profit;
     // const profit = latestMoney - investMoney;
     setLatestInfo({
       totalInvest: investMoney,
-      totalMoney: latestMoney,
+      // totalMoney: latestMoney,
       position: num,
       latestCost,
       profit,
@@ -462,8 +464,8 @@ const Page = () => {
             content={
               <>
                 <p>
-                  当前总投资：
-                  <span style={{ fontWeight: 'bold' }}>{formatMoney(statInfo.allInvest)}元</span>
+                  在投总市值：
+                  <span style={{ fontWeight: 'bold' }}>{formatMoney(statInfo.allMoney)}元</span>
                 </p>
                 <p>
                   累计总盈亏：

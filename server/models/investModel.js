@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2022-01-10 15:45:58
- * @LastEditTime: 2022-01-19 16:31:58
+ * @LastEditTime: 2022-01-20 13:52:03
  * @LastEditors: Vincent
  * @Description:
  */
@@ -52,7 +52,7 @@ const getInvestListByOptionsModel = async (data) => {
   if (result && result.rows.length > 0) {
     const itemIds = [];
     let cumulativeProfit = 0; // 累计盈亏
-    let allInvest = 0; // 在投项目的总投资
+    let allMoney = 0; // 在投项目的市值
     result.rows.forEach((item) => itemIds.push(`'${item.id}'`));
     const recordList = await PamDatabase.query(
       `select * from invest_record as a INNER join invest_history as b ON a.id = b.recordId where b.itemId in (${itemIds.toString()})`,
@@ -61,7 +61,7 @@ const getInvestListByOptionsModel = async (data) => {
       result.rows.forEach((item) => {
         cumulativeProfit += parseFloat(item.profit);
         if (item.status) {
-          allInvest += parseFloat(item.totalInvest);
+          allMoney += parseFloat(item.totalMoney);
         }
         const optRecords = [];
         recordList[0].forEach((a) => {
@@ -74,7 +74,7 @@ const getInvestListByOptionsModel = async (data) => {
     }
     result.statObj = {
       cumulativeProfit,
-      allInvest,
+      allMoney,
     };
   }
   return result;
@@ -105,18 +105,8 @@ const deleteInvestItemByIdModel = async (id) => {
  * @return {*}
  */
 const addInvestRecordModel = async (data) => {
-  const {
-    id,
-    date,
-    investOpt,
-    investCost,
-    investNum,
-    latestCost,
-    totalMoney,
-    profit,
-    position,
-    totalInvest,
-  } = data;
+  const { id, date, investOpt, investCost, investNum, latestCost, profit, position, totalInvest } =
+    data;
   let isDone = false;
   //   插入新的投资操作记录
   const recordId = UUID.v1();
@@ -144,7 +134,6 @@ const addInvestRecordModel = async (data) => {
     }
     await InvestItem.update(
       {
-        totalMoney,
         totalInvest,
         profit,
         cost: latestCost,
