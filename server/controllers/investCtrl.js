@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2022-01-10 15:45:22
- * @LastEditTime: 2022-01-20 14:01:00
+ * @LastEditTime: 2022-01-22 17:22:16
  * @LastEditors: Vincent
  * @Description:
  */
@@ -11,6 +11,8 @@ const {
   deleteInvestItemByIdModel,
   addInvestRecordModel,
   updateLatestPriceModel,
+  addMoneyFlowingModel,
+  getUserCountInfoModel,
 } = require('../models/investModel');
 const Koa2Req = require('koa2-request');
 const { setResponseBody } = require('../utils/utils');
@@ -136,26 +138,75 @@ const addInvestRecordCtrl = async (ctx) => {
 const updateLatestPriceCtrl = async (ctx) => {
   const { id, code, cost, position } = ctx.request.query;
   try {
-    const latestRes = await Koa2Req(`http://hq.sinajs.cn/list=${code}`);
+    const latestRes = await Koa2Req(
+      `http://web.juhe.cn:8080/finance/stock/hs?key=65d5d901d21cff585ce9c01123da66a4&gid=${code}`,
+    );
     if (latestRes.body) {
-      const latestInfo = latestRes.body.split('=')[1].split(',');
-      const latestPrice = parseFloat(latestInfo[3]);
-      const profit = (latestPrice - parseFloat(cost)) * parseInt(position);
-      const totalMoney = latestPrice * parseInt(position);
-      const result = await updateLatestPriceModel({
-        id,
-        latestPrice: latestInfo[3],
-        latestDate: new Date().valueOf(),
-        profit,
-        totalMoney,
-      });
-      if (result) {
-        ctx.body = setResponseBody();
+      const dataSource = JSON.parse(latestRes.body);
+      if (dataSource.resultcode === '200') {
+        const { data } = dataSource.result[0];
+        const latestPrice = parseFloat(data.nowPri);
+        const profit = (latestPrice - parseFloat(cost)) * parseInt(position);
+        const totalMoney = latestPrice * parseInt(position);
+        const result = await updateLatestPriceModel({
+          id,
+          latestPrice,
+          latestDate: new Date().valueOf(),
+          profit,
+          totalMoney,
+        });
+        if (result) {
+          ctx.body = setResponseBody();
+        } else {
+          ctx.body = setResponseBody({}, '-1', '操作出错');
+        }
       } else {
-        ctx.body = setResponseBody({}, '-1', '操作出错');
+        ctx.body = setResponseBody(dataSource.reason, '-1', '第三方接口出错');
       }
     } else {
       ctx.body = setResponseBody({}, '-1', '获取最新价格出错');
+    }
+  } catch (e) {
+    ctx.body = setResponseBody(e, '-1', '服务出错');
+  }
+};
+
+/**
+ * @description: 新增资金流水
+ * @param {*} ctx
+ * @return {*}
+ */
+const addMoneyFlowingCtrl = async (ctx) => {
+  const { userId, money, moneyOpt, investType } = ctx.request.body;
+  try {
+    // 先查账户
+    const userCountInfo = await getUserCountInfoModel({ userId });
+
+    // 再插入记录
+    const result = await addMoneyFlowingModel({
+      userId,
+      money,
+      moneyOpt,
+      investType,
+    });
+    if (result) {
+      ctx.body = setResponseBody();
+    } else {
+      ctx.body = setResponseBody({}, '-1', '操作失败');
+    }
+  } catch (e) {
+    ctx.body = setResponseBody(e, '-1', '服务出错');
+  }
+};
+
+const getUserCountInfoCtrl = async (ctx) => {
+  const { id } = ctx.request.query;
+  try {
+    const result = await getUserCountInfoModel({ userId: id });
+    if (result) {
+      ctx.body = setResponseBody(result);
+    } else {
+      ctx.body = setResponseBody({}, '-1', '获取失败');
     }
   } catch (e) {
     ctx.body = setResponseBody(e, '-1', '服务出错');
@@ -168,4 +219,6 @@ module.exports = {
   deleteInvestItemByIdCtrl,
   addInvestRecordCtrl,
   updateLatestPriceCtrl,
+  addMoneyFlowingCtrl,
+  getUserCountInfoCtrl,
 };

@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2021-12-07 14:12:16
- * @LastEditTime: 2022-01-17 14:55:00
+ * @LastEditTime: 2022-01-22 17:00:04
  * @LastEditors: Vincent
  * @Description: 接口映射
  */
@@ -45,5 +45,14 @@ router.post('/investmng/addInvestRecord', investCtrl.addInvestRecordCtrl);
 
 // 更新现价
 router.get('/investmng/getLatestPriceByCode', investCtrl.updateLatestPriceCtrl);
+
+// 获取资金流水列表
+router.get('/investmng/getmoneyflowinglist', investCtrl.getMoneyFlowingListCtrl);
+
+// 根据用户id获取资金账户情况
+router.get('/investmng/getUserCountById', investCtrl.getUserCountInfoCtrl);
+
+// 新增资金流水信息
+router.get('/investmng/addmoneyflowing', investCtrl.addMoneyFlowingCtrl);
 
 module.exports = router;

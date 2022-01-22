@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2022-01-10 15:45:58
- * @LastEditTime: 2022-01-20 13:52:03
+ * @LastEditTime: 2022-01-22 17:21:23
  * @LastEditors: Vincent
  * @Description:
  */
@@ -11,6 +11,8 @@ const sequelize = require('sequelize');
 const InvestItem = Mysql.invest_item;
 const InvestHistory = Mysql.invest_history;
 const InvestRecord = Mysql.invest_record;
+const InvestMoneyFlowing = Mysql.invest_moneyflowing;
+const InvestUserCount = Mysql.invest_usercount;
 
 /**
  * @description: 新增投资项
@@ -169,10 +171,31 @@ const updateLatestPriceModel = async (data) => {
   return isUpdate;
 };
 
+const addMoneyFlowingModel = async (data) => {
+  const { userId } = data;
+  await InvestMoneyFlowing.create({
+    id: UUID.v1(),
+    userId,
+    ...data,
+  });
+};
+
+const getUserCountInfoModel = async (data) => {
+  const { userId } = data;
+  const result = await InvestUserCount.find({
+    where: {
+      userId,
+    },
+  });
+  return result;
+};
+
 module.exports = {
   addInvestItemModel,
   getInvestListByOptionsModel,
   deleteInvestItemByIdModel,
   addInvestRecordModel,
   updateLatestPriceModel,
+  addMoneyFlowingModel,
+  getUserCountInfoModel,
 };
