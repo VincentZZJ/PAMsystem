@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2021-12-06 10:50:51
- * @LastEditTime: 2022-01-15 16:09:14
+ * @LastEditTime: 2022-01-22 16:06:16
  * @LastEditors: Vincent
  * @Description:
  */
@@ -103,6 +103,12 @@ export default [
             name: '投资清单',
             icon: 'icon-touzishijian',
             component: './financial/InvestList',
+          },
+          {
+            path: '/financial/investmng',
+            name: '资金流水',
+            icon: 'icon-touzishijian',
+            component: './financial/InvestMng',
           },
         ],
       },

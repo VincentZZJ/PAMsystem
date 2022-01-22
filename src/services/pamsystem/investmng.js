@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2022-01-11 15:41:54
- * @LastEditTime: 2022-01-17 15:04:11
+ * @LastEditTime: 2022-01-22 16:58:05
  * @LastEditors: Vincent
  * @Description:
  */
@@ -42,4 +42,23 @@ export async function updateInvestService(data) {
 // 获取最新价格
 export async function updatePriceByCodeService(data) {
   return request(`/pamsystem/investmng/getLatestPriceByCode?${Stringify(data)}`);
+}
+
+// 新增银证流水
+export async function addMoneyFlowing(data) {
+  return request(`/pamsystem/investmng/addmoneyflowing`, {
+    method: 'post',
+    requestType: 'form',
+    data,
+  });
+}
+
+// 获取资金流水列表
+export async function getMoneyFlowingList(data) {
+  return request(`/pamsystem/investmng/getmoneyflowinglist?${Stringify(data)}`);
+}
+
+// 根据用户id获取账户情况
+export async function getUserCountInfoById(id) {
+  return request(`/pamsystem/investmng/getUserCountById?userId=${id}`);
 }

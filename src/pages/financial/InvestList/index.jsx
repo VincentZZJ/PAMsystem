@@ -180,16 +180,20 @@ const Page = () => {
       render: (text, record) => {
         return (
           <>
-            <span
-              className="linkCls"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleUpdateOpt(record);
-              }}
-            >
-              更新
-            </span>
-            <Divider type="vertical" />
+            {record?.status ? (
+              <>
+                <span
+                  className="linkCls"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleUpdateOpt(record);
+                  }}
+                >
+                  更新
+                </span>
+                <Divider type="vertical" />
+              </>
+            ) : null}
             <Popconfirm title="确定删除吗？" onConfirm={() => handleDelInvestItem(record.id)}>
               <span
                 className="linkCls"
@@ -500,7 +504,7 @@ const Page = () => {
             </Form.Item>
             <Form.Item name="investType" initialValue="">
               <Select className="inputWidth">
-                <Option value="">全部</Option>
+                <Option value="">投资类型(全部)</Option>
                 {Object.keys(InvestType).map((item) => (
                   <Option key={item} value={item}>
                     {InvestType[item]}
