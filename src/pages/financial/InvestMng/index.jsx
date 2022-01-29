@@ -1,13 +1,13 @@
 /*
  * @Author: Vincent
  * @Date: 2022-01-22 15:02:50
- * @LastEditTime: 2022-01-22 16:37:30
+ * @LastEditTime: 2022-01-30 00:04:16
  * @LastEditors: Vincent
  * @Description:
  */
 
 import React, { useEffect, useState } from 'react';
-import { Button, Table, Modal, Form, Input, Radio, message, Select } from 'antd';
+import { Button, Table, Modal, Form, Input, Radio, message, Select, DatePicker } from 'antd';
 import { formatMoney } from '@/utils/utils';
 import { InvestType } from '@/utils/constant';
 import { PlusOutlined } from '@ant-design/icons';
@@ -18,14 +18,17 @@ import {
   getMoneyFlowingList,
 } from '@/services/pamsystem/investmng';
 import styles from './index.less';
+import moment from 'moment';
 
 const { Option } = Select;
+const { RangePicker } = DatePicker;
 
 const Page = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [isRefresh, setIsRefresh] = useState('');
   const [investType, setInvestType] = useState('');
   const [pagination, setPagination] = useState({ pageSize: 10, currentPage: 1 });
+  const [timeRange, setTimeRange] = useState([moment().subtract('M', 3), moment()]);
   const [recordsTotal, setRecordsTotal] = useState(0);
   const [moneyFlowingList, setMoneyFlowingList] = useState([]);
   const [userCountInfo, setUserCountInfo] = useState({});
@@ -44,9 +47,13 @@ const Page = () => {
       render: (text) => (text ? `${InvestType[text]}账户` : '/'),
     },
     {
+      title: '交易时间',
+      dataIndex: 'createDate',
+    },
+    {
       title: '银证转账',
       dataIndex: 'moneyOpt',
-      render: (text) => (text === '1' ? '转入' : '转出'),
+      render: (text) => (text === 1 ? '转入' : '转出'),
     },
     {
       title: '金额(元)',
@@ -63,7 +70,7 @@ const Page = () => {
   //   表单提交
   const onFinish = async (values) => {
     try {
-      const result = await addMoneyFlowing(values);
+      const result = await addMoneyFlowing({ ...values, userId: initialState.currentUser.userId });
       if (result && result.code === '0') {
         message.success('操作成功');
         setIsRefresh(new Date().valueOf());
@@ -87,6 +94,13 @@ const Page = () => {
     const val = e.target.value;
     if (userCountInfo?.id) {
       setRestMoney(val === '1' ? userCountInfo.stockCount : userCountInfo.fundCount);
+    }
+  };
+
+  // 时间切换
+  const handleTimeChange = (val) => {
+    if (val) {
+      setTimeRange(val);
     }
   };
 
@@ -122,10 +136,20 @@ const Page = () => {
       }
     };
     if (initialState?.currentUser?.userId) {
-      fetchMoneyFlowingList({ ...pagination, investType });
+      const params = {};
+      if (timeRange?.length > 0) {
+        params.startDate = timeRange[0].format('YYYY-MM-DD');
+        params.endDate = timeRange[1].format('YYYY-MM-DD');
+      }
+      fetchMoneyFlowingList({
+        ...pagination,
+        investType,
+        ...params,
+        userId: initialState.currentUser.userId,
+      });
       fetchUserCountInfo(initialState.currentUser.userId);
     }
-  }, [isRefresh, pagination, investType, initialState]);
+  }, [isRefresh, pagination, investType, initialState, timeRange]);
 
   return (
     <div className={styles.wrap}>
@@ -137,6 +161,7 @@ const Page = () => {
             <Option value="1">股票账户</Option>
             <Option value="2">基金账户</Option>
           </Select>
+          <RangePicker value={timeRange} onChange={handleTimeChange} />
           <Button type="primary" onClick={() => setModalVisible(true)}>
             <PlusOutlined />
             银证转账
@@ -177,7 +202,7 @@ const Page = () => {
               <Form.Item name="investType" noStyle initialValue="1">
                 <Radio.Group onChange={handleCountChange}>
                   <Radio.Button value="1">股票账号</Radio.Button>
-                  <Radio.Button value="0">基金账号</Radio.Button>
+                  <Radio.Button value="2">基金账号</Radio.Button>
                 </Radio.Group>
               </Form.Item>
               <span style={{ marginLeft: '0.4rem' }}>(当前余额：{formatMoney(restMoney, 2)})</span>

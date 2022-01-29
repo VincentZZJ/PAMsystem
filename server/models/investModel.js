@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2022-01-10 15:45:58
- * @LastEditTime: 2022-01-22 17:21:23
+ * @LastEditTime: 2022-01-30 00:20:43
  * @LastEditors: Vincent
  * @Description:
  */
@@ -53,15 +53,26 @@ const getInvestListByOptionsModel = async (data) => {
   });
   if (result && result.rows.length > 0) {
     const itemIds = [];
-    let cumulativeProfit = 0; // 累计盈亏
+    let cumulativeStockProfit = 0; // 股票累计盈亏
+    let cumulativeFundProfit = 0; // 基金累计盈亏
     let allMoney = 0; // 在投项目的市值
     result.rows.forEach((item) => itemIds.push(`'${item.id}'`));
     const recordList = await PamDatabase.query(
       `select * from invest_record as a INNER join invest_history as b ON a.id = b.recordId where b.itemId in (${itemIds.toString()})`,
     );
+    const userCountInfo = await InvestUserCount.findOne({
+      where: {
+        userId: params.userid,
+      },
+    });
     if (recordList && recordList.length > 0) {
       result.rows.forEach((item) => {
-        cumulativeProfit += parseFloat(item.profit);
+        // cumulativeProfit += parseFloat(item.profit);
+        if (item.investType === '1') {
+          cumulativeStockProfit += parseFloat(item.profit);
+        } else if (item.investType === '2') {
+          cumulativeFundProfit += parseFloat(item.profit);
+        }
         if (item.status) {
           allMoney += parseFloat(item.totalMoney);
         }
@@ -75,8 +86,11 @@ const getInvestListByOptionsModel = async (data) => {
       });
     }
     result.statObj = {
-      cumulativeProfit,
       allMoney,
+      cumulativeFundProfit,
+      cumulativeStockProfit,
+      investStockMoney: parseFloat(userCountInfo.stockCount),
+      investFundMoney: parseFloat(userCountInfo.fundCount),
     };
   }
   return result;
@@ -172,22 +186,70 @@ const updateLatestPriceModel = async (data) => {
 };
 
 const addMoneyFlowingModel = async (data) => {
-  const { userId } = data;
-  await InvestMoneyFlowing.create({
+  const isAdd = await InvestMoneyFlowing.create({
     id: UUID.v1(),
-    userId,
     ...data,
   });
+  return isAdd;
 };
 
 const getUserCountInfoModel = async (data) => {
   const { userId } = data;
-  const result = await InvestUserCount.find({
+  const countInfo = await InvestUserCount.findOne({
     where: {
       userId,
     },
   });
+  let result = countInfo;
+  if (!result) {
+    // 若没有，则新建,后续应该先判断userId是否有效再创建
+    result = await InvestUserCount.create({
+      id: UUID.v1(),
+      userId,
+      stockCount: 0,
+      fundCount: 0,
+    });
+  }
   return result;
+};
+
+const getMoneyFlowingListModel = async (data) => {
+  const { params, pagination } = data;
+  const pageSize = parseInt(pagination.pageSize);
+  const currentPage = parseInt(pagination.currentPage);
+  const { startDate, endDate, userId, ...otherOpts } = params;
+  const result = await InvestMoneyFlowing.findAndCountAll({
+    where: {
+      userId,
+      ...otherOpts,
+      createDate: {
+        [sequelize.Op.between]: [startDate, endDate],
+      },
+    },
+    order: [
+      ['createDate', 'DESC'],
+      ['investType', 'DESC'],
+    ],
+    raw: true,
+    limit: pageSize,
+    offset: (currentPage - 1) * pageSize,
+  });
+  return result;
+};
+
+const updateUserCountModel = async (data) => {
+  const { userId, ...params } = data;
+  const isUpdate = await InvestUserCount.update(
+    {
+      ...params,
+    },
+    {
+      where: {
+        userId: userId,
+      },
+    },
+  );
+  return isUpdate;
 };
 
 module.exports = {
@@ -198,4 +260,6 @@ module.exports = {
   updateLatestPriceModel,
   addMoneyFlowingModel,
   getUserCountInfoModel,
+  getMoneyFlowingListModel,
+  updateUserCountModel,
 };

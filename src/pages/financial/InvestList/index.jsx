@@ -468,13 +468,50 @@ const Page = () => {
             content={
               <>
                 <p>
+                  股票总投资：
+                  <span style={{ fontWeight: 'bold' }}>
+                    {formatMoney(statInfo.investStockMoney)}元
+                  </span>
+                </p>
+                <p>
                   在投总市值：
                   <span style={{ fontWeight: 'bold' }}>{formatMoney(statInfo.allMoney)}元</span>
                 </p>
                 <p>
+                  股票累计盈亏：
+                  <span className={statInfo?.cumulativeStockProfit > 0 ? 'redCls' : 'greenCls'}>
+                    {formatMoney(statInfo.cumulativeStockProfit)}元
+                  </span>
+                </p>
+                <p>
+                  基金总投资：
+                  <span style={{ fontWeight: 'bold' }}>
+                    {formatMoney(statInfo.investFundMoney)}元
+                  </span>
+                </p>
+                <p>
+                  基金累计盈亏：
+                  <span className={statInfo?.cumulativeFundProfit > 0 ? 'redCls' : 'greenCls'}>
+                    {formatMoney(statInfo.cumulativeFundProfit)}元
+                  </span>
+                </p>
+                <Divider />
+                <p>
+                  账户总投资：
+                  <span style={{ fontWeight: 'bold' }}>
+                    {formatMoney(statInfo.investStockMoney + statInfo.investFundMoney)}元
+                  </span>
+                </p>
+                <p>
                   累计总盈亏：
-                  <span className={statInfo?.cumulativeProfit > 0 ? 'redCls' : 'greenCls'}>
-                    {formatMoney(statInfo.cumulativeProfit)}元
+                  <span
+                    className={
+                      statInfo?.cumulativeFundProfit + statInfo?.cumulativeStockProfit > 0
+                        ? 'redCls'
+                        : 'greenCls'
+                    }
+                  >
+                    {formatMoney(statInfo.cumulativeStockProfit + statInfo.cumulativeFundProfit)}元
                   </span>
                 </p>
               </>

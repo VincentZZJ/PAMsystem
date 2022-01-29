@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2022-01-10 15:45:22
- * @LastEditTime: 2022-01-22 17:22:16
+ * @LastEditTime: 2022-01-25 16:53:26
  * @LastEditors: Vincent
  * @Description:
  */
@@ -13,8 +13,11 @@ const {
   updateLatestPriceModel,
   addMoneyFlowingModel,
   getUserCountInfoModel,
+  getMoneyFlowingListModel,
+  updateUserCountModel,
 } = require('../models/investModel');
 const Koa2Req = require('koa2-request');
+const moment = require('moment');
 const { setResponseBody } = require('../utils/utils');
 
 /**
@@ -181,13 +184,27 @@ const addMoneyFlowingCtrl = async (ctx) => {
   try {
     // 先查账户
     const userCountInfo = await getUserCountInfoModel({ userId });
-
+    const { stockCount, fundCount } = userCountInfo;
+    // 更新账户
+    let restMoney = investType === '1' ? parseFloat(stockCount) : parseFloat(fundCount);
+    if (moneyOpt === '1') {
+      restMoney += parseFloat(money);
+    } else {
+      restMoney -= parseFloat(money);
+    }
+    if (investType === '1') {
+      await updateUserCountModel({ userId, stockCount: restMoney });
+    } else if (investType === '2') {
+      await updateUserCountModel({ userId, fundCount: restMoney });
+    }
     // 再插入记录
     const result = await addMoneyFlowingModel({
       userId,
       money,
       moneyOpt,
       investType,
+      restMoney,
+      createDate: moment().format('YYYY-MM-DD'),
     });
     if (result) {
       ctx.body = setResponseBody();
@@ -199,10 +216,40 @@ const addMoneyFlowingCtrl = async (ctx) => {
   }
 };
 
+/**
+ * @description: 根据用户id获取账户信息
+ * @param {*} ctx
+ * @return {*}
+ */
 const getUserCountInfoCtrl = async (ctx) => {
-  const { id } = ctx.request.query;
+  const { userId } = ctx.request.query;
   try {
-    const result = await getUserCountInfoModel({ userId: id });
+    const result = await getUserCountInfoModel({ userId });
+    ctx.body = setResponseBody(result);
+  } catch (e) {
+    ctx.body = setResponseBody(e, '-1', '服务出错');
+  }
+};
+
+/**
+ * @description: 获取资金流水
+ * @param {*} ctx
+ * @return {*}
+ */
+const getMoneyFlowingListCtrl = async (ctx) => {
+  const searchDict = ['userId', 'startDate', 'endDate', 'investType'];
+  const { pageSize, currentPage, ...data } = ctx.request.query;
+  const params = {};
+  Object.keys(data).forEach((item) => {
+    if (searchDict.includes(item) && data[item]) {
+      params[item] = data[item];
+    }
+  });
+  try {
+    const result = await getMoneyFlowingListModel({
+      params,
+      pagination: { pageSize, currentPage },
+    });
     if (result) {
       ctx.body = setResponseBody(result);
     } else {
@@ -221,4 +268,5 @@ module.exports = {
   updateLatestPriceCtrl,
   addMoneyFlowingCtrl,
   getUserCountInfoCtrl,
+  getMoneyFlowingListCtrl,
 };

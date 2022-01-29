@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2021-12-07 14:12:16
- * @LastEditTime: 2022-01-22 17:00:04
+ * @LastEditTime: 2022-01-24 14:03:56
  * @LastEditors: Vincent
  * @Description: 接口映射
  */
@@ -53,6 +53,6 @@ router.get('/investmng/getmoneyflowinglist', investCtrl.getMoneyFlowingListCtrl)
 router.get('/investmng/getUserCountById', investCtrl.getUserCountInfoCtrl);
 
 // 新增资金流水信息
-router.get('/investmng/addmoneyflowing', investCtrl.addMoneyFlowingCtrl);
+router.post('/investmng/addmoneyflowing', investCtrl.addMoneyFlowingCtrl);
 
 module.exports = router;
