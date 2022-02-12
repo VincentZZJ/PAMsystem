@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2021-12-06 14:24:17
- * @LastEditTime: 2021-12-07 15:21:56
+ * @LastEditTime: 2022-02-12 14:37:23
  * @LastEditors: Vincent
  * @Description:
  */
@@ -12,6 +12,7 @@
 const Koa = require('koa');
 const app = new Koa();
 const json = require('koa-json');
+const koaStatic = require('koa-static');
 const bodyparser = require('koa-bodyparser');
 const logger = require('koa-logger');
 const router = require('./server/routes/index');
@@ -24,6 +25,9 @@ app.use(
 );
 app.use(json());
 app.use(logger());
+
+// 配置静态资源目录
+app.use(koaStatic(__dirname + '/server/statics'));
 
 // 日志
 app.use(async (ctx, next) => {
