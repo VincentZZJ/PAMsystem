@@ -11,11 +11,39 @@
  Target Server Version : 80018
  File Encoding         : 65001
 
- Date: 22/01/2022 17:24:04
+ Date: 12/02/2022 17:29:59
 */
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+-- Table structure for attachment_list
+-- ----------------------------
+DROP TABLE IF EXISTS `attachment_list`;
+CREATE TABLE `attachment_list`  (
+  `id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '附件id',
+  `diaryId` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '日记id',
+  `fileUrl` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '文件相对路径',
+  `filePath` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '文件绝对路径(不发送给前端)',
+  `isDel` int(10) NOT NULL DEFAULT 0 COMMENT '文件是否被删除(1- 已删除，0 - 未删除 )',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Table structure for diary_list
+-- ----------------------------
+DROP TABLE IF EXISTS `diary_list`;
+CREATE TABLE `diary_list`  (
+  `id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '日记id(userid拼接该日时间戳)',
+  `userId` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '用户id',
+  `diaryTitle` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '日记标题',
+  `diaryContent` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '日记内容',
+  `date` date NOT NULL COMMENT '日记时间',
+  `diaryTag` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '日记标签(待用字段)',
+  `isDel` int(10) NOT NULL DEFAULT 0 COMMENT '是否已删除(1-已删 ， 0-未删)',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for invest_history
