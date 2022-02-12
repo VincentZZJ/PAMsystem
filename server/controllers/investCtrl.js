@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2022-01-10 15:45:22
- * @LastEditTime: 2022-01-25 16:53:26
+ * @LastEditTime: 2022-02-10 19:51:55
  * @LastEditors: Vincent
  * @Description:
  */
@@ -18,7 +18,10 @@ const {
 } = require('../models/investModel');
 const Koa2Req = require('koa2-request');
 const moment = require('moment');
-const { setResponseBody } = require('../utils/utils');
+const { setResponseBody, createFileFromUpload } = require('../utils/utils');
+const fsPromise = require('fs').promises;
+const fs = require('fs');
+const path = require('path');
 
 /**
  * @description: 新增投资项
@@ -180,7 +183,7 @@ const updateLatestPriceCtrl = async (ctx) => {
  * @return {*}
  */
 const addMoneyFlowingCtrl = async (ctx) => {
-  const { userId, money, moneyOpt, investType } = ctx.request.body;
+  const { userId, money, moneyOpt, investType, createDate } = ctx.request.body;
   try {
     // 先查账户
     const userCountInfo = await getUserCountInfoModel({ userId });
@@ -204,7 +207,7 @@ const addMoneyFlowingCtrl = async (ctx) => {
       moneyOpt,
       investType,
       restMoney,
-      createDate: moment().format('YYYY-MM-DD'),
+      createDate,
     });
     if (result) {
       ctx.body = setResponseBody();
@@ -260,6 +263,48 @@ const getMoneyFlowingListCtrl = async (ctx) => {
   }
 };
 
+// 测试上传文件
+const uploadFileCtrl = async (ctx) => {
+  console.log(__dirname);
+  const { username } = ctx.request.body;
+  const { file } = ctx.request;
+  console.log(username);
+  try {
+    const newPath = path.join(__dirname, `../statics/${username}`);
+    let isSave = false;
+    await fsPromise
+      .access(newPath)
+      .then(async () => {
+        isSave = true;
+        await fsPromise.rename(file.path, `${newPath}/${file.filename}`);
+      })
+      .catch(async (err) => {
+        await fsPromise.mkdir(newPath);
+        isSave = true;
+        await fsPromise.rename(file.path, `${newPath}/${file.filename}`);
+      });
+    // fs.access(newPath, async (err) => {
+    //   if (err) {
+    //     fsPromise.mkdir(newPath);
+    //   }
+    //   await fsPromise.rename(file.path, `${newPath}/${file.filename}`);
+    //   // if (isSave) {
+    //   // ctx.body = setResponseBody(newPath);
+    //   isSave = true;
+    //   // } else {
+    //   //   ctx.body = setResponseBody({}, '-1', '上传失败');
+    //   // }
+    // });
+    if (isSave) {
+      ctx.body = setResponseBody(newPath);
+    } else {
+      ctx.body = setResponseBody({}, '-1', '上传失败');
+    }
+  } catch (e) {
+    ctx.body = setResponseBody(e, '-1', '服务出错');
+  }
+};
+
 module.exports = {
   addInvestItemCtrl,
   getInvestListByOptionsCtrl,
@@ -269,4 +314,5 @@ module.exports = {
   addMoneyFlowingCtrl,
   getUserCountInfoCtrl,
   getMoneyFlowingListCtrl,
+  uploadFileCtrl,
 };

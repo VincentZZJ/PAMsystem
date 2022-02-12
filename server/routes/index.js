@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2021-12-07 14:12:16
- * @LastEditTime: 2022-01-24 14:03:56
+ * @LastEditTime: 2022-02-12 15:52:32
  * @LastEditors: Vincent
  * @Description: 接口映射
  */
@@ -9,8 +9,24 @@
 
 // 实例化路由
 const router = require('koa-router')();
+const multer = require('@koa/multer');
+const path = require('path');
 const userCtrl = require('../controllers/userCtrl');
 const investCtrl = require('../controllers/investCtrl');
+const diaryCtrl = require('../controllers/diaryCtrl');
+
+// 上传文件存放路径及文件命名
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, path.join(__dirname, '../statics'));
+  },
+  filename: function (req, file, cb) {
+    let fileInfo = file.originalname.split('.');
+    cb(null, `${fileInfo[0]}-${Date.now().toString(16)}.${fileInfo[1]}`);
+  },
+});
+
+const uploader = multer({ storage });
 
 // 定义路由前缀
 router.prefix('/pamsystem');
@@ -54,5 +70,17 @@ router.get('/investmng/getUserCountById', investCtrl.getUserCountInfoCtrl);
 
 // 新增资金流水信息
 router.post('/investmng/addmoneyflowing', investCtrl.addMoneyFlowingCtrl);
+
+// 上传文件接口(接收file命名的字段)
+router.post('/uploadFile', uploader.single('file'), investCtrl.uploadFileCtrl);
+
+// 根据条件获取日记记录
+router.get('/diarymng/getDiaryByOptions', diaryCtrl.getDiaryByOptionsCtrl);
+
+// 根据id删除日记记录及取消附件关联
+router.delete('/diarymng/deleteDiaryById', diaryCtrl.deleteDiaryByIdCtrl);
+
+// 保存日记
+router.post('/diarymng/saveDiaryInfo', diaryCtrl.saveDiaryInfoCtrl);
 
 module.exports = router;
