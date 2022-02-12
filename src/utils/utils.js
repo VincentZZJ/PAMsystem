@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2021-12-21 14:48:11
- * @LastEditTime: 2022-01-19 15:44:39
+ * @LastEditTime: 2022-02-12 17:02:21
  * @LastEditors: Vincent
  * @Description:
  */
@@ -36,4 +36,22 @@ export const formatMoney = (money, n = 3) => {
     resultArr.unshift('-');
   }
   return resultArr.join('') + '.' + moneyInitArr[1];
+};
+
+// 解析图片
+export const getBase64 = (file) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = (error) => reject(error);
+  });
+};
+
+export const shortLongText = (text, len) => {
+  if (text.length > len) {
+    return text.substring(0, len) + '...';
+  } else {
+    return text;
+  }
 };

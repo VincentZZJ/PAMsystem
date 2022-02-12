@@ -1,0 +1,82 @@
+@import '../../baseStyles.less';
+
+.contentWrap {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  .contentTop {
+    display: flex;
+    flex-direction: row;
+    flex-grow: 1;
+    height: calc(100% - 11rem);
+    margin: 0.5rem 0;
+    & > div:first-child {
+      flex-grow: 1;
+      overflow: hidden;
+    }
+    & > div:last-child {
+      width: unit(400 / @baseFontSize, rem);
+      min-width: unit(400 / @baseFontSize, rem);
+      margin-left: 0.5rem;
+      padding: 0.2rem;
+      border-left: 1px solid @border_color;
+    }
+    .rightTop {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      font-weight: bold;
+      font-size: 1.2rem;
+      border-bottom: 1px solid @border_color;
+      & > div {
+        & > span {
+          margin: 0 0.2rem;
+          cursor: pointer;
+        }
+      }
+    }
+    .detailTitle {
+      font-weight: bold;
+      font-size: 0.9rem;
+      line-height: 1.5rem;
+    }
+  }
+  .contentBtm {
+    height: unit(160 / @baseFontSize, rem);
+    min-height: unit(160 / @baseFontSize, rem);
+    padding: 1rem;
+    border-top: 1px solid @border_color;
+    .imageCls {
+      width: unit(140 / @baseFontSize, rem);
+      height: unit(140 / @baseFontSize, rem);
+      margin: 0 0.5rem;
+      background-color: #e3e3e3;
+      border-radius: 0.5rem;
+    }
+  }
+}
+
+.diaryWrap {
+  display: flex;
+  justify-content: space-between;
+  height: 100%;
+  padding: 0.2rem;
+  & > div:first-child {
+    flex-grow: 1;
+  }
+  & > div:last-child {
+    width: unit(460 / @baseFontSize, rem);
+    min-width: unit(460 / @baseFontSize, rem);
+    margin-left: 0.5rem;
+    padding: 0.2rem;
+    border-left: 1px solid @border_color;
+  }
+  .rightTop {
+    margin-bottom: 1rem;
+    padding: 0.2rem 0;
+    font-weight: bold;
+    font-size: 1rem;
+    border-bottom: 1px solid @border_color;
+  }
+}

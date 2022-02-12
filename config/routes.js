@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2021-12-06 10:50:51
- * @LastEditTime: 2022-01-22 16:06:16
+ * @LastEditTime: 2022-02-11 10:58:54
  * @LastEditors: Vincent
  * @Description:
  */
@@ -80,6 +80,13 @@ export default [
         name: '欢迎页',
         icon: 'icon-shouye',
         component: './Welcome',
+        isRoutes: true,
+      },
+      {
+        path: '/diarymng',
+        name: '日记管理',
+        icon: 'icon-touzi',
+        component: './diary',
         isRoutes: true,
       },
       {

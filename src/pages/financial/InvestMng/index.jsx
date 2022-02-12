@@ -1,14 +1,25 @@
 /*
  * @Author: Vincent
  * @Date: 2022-01-22 15:02:50
- * @LastEditTime: 2022-01-30 00:04:16
+ * @LastEditTime: 2022-02-11 11:03:28
  * @LastEditors: Vincent
  * @Description:
  */
 
 import React, { useEffect, useState } from 'react';
-import { Button, Table, Modal, Form, Input, Radio, message, Select, DatePicker } from 'antd';
-import { formatMoney } from '@/utils/utils';
+import {
+  Button,
+  Table,
+  Modal,
+  Form,
+  Input,
+  Radio,
+  message,
+  Select,
+  DatePicker,
+  Upload,
+} from 'antd';
+import { formatMoney, getBase64 } from '@/utils/utils';
 import { InvestType } from '@/utils/constant';
 import { PlusOutlined } from '@ant-design/icons';
 import { useModel } from 'umi';
@@ -17,6 +28,7 @@ import {
   getUserCountInfoById,
   getMoneyFlowingList,
 } from '@/services/pamsystem/investmng';
+import PageWrapper from '@/components/PageWrapper';
 import styles from './index.less';
 import moment from 'moment';
 
@@ -34,6 +46,9 @@ const Page = () => {
   const [userCountInfo, setUserCountInfo] = useState({});
   const [restMoney, setRestMoney] = useState(0);
   const { initialState } = useModel('@@initialState');
+  const [fileList, setFileList] = useState([]);
+  const [previewVisible, setPreviewVisible] = useState(false);
+  const [previewInfo, setPreviewInfo] = useState({});
   const [addForm] = Form.useForm();
 
   const columns = [
@@ -104,6 +119,19 @@ const Page = () => {
     }
   };
 
+  const handleChange = ({ fileList }) => setFileList(fileList);
+
+  const handlePreview = async (file) => {
+    if (!file.url && !file.preview) {
+      file.preview = await getBase64(file.originFileObj);
+    }
+    setPreviewVisible(true);
+    setPreviewInfo({
+      previewImage: file.url || file.preview,
+      previewTitle: file.name || file.url.substring(file.url.lastIndexOf('/') + 1),
+    });
+  };
+
   useEffect(() => {
     //   获取资金流水
     const fetchMoneyFlowingList = async (data) => {
@@ -152,9 +180,9 @@ const Page = () => {
   }, [isRefresh, pagination, investType, initialState, timeRange]);
 
   return (
-    <div className={styles.wrap}>
-      <div className={styles.top}>
-        <div className={styles.headTitle}>资金流水</div>
+    <PageWrapper
+      pageTitleCmp="资金流水"
+      pageTitleExtraCmp={
         <div>
           <Select value={investType} onSelect={(val) => setInvestType(val)}>
             <Option value="">资金账户(全部)</Option>
@@ -167,64 +195,98 @@ const Page = () => {
             银证转账
           </Button>
         </div>
-      </div>
-      <div>
-        <Table
-          columns={columns}
-          dataSource={moneyFlowingList}
-          pagination={{
-            showSizeChanger: true,
-            showQuickJumper: false,
-            total: recordsTotal,
-            current: pagination.currentPage,
-            showTotal: () => (
-              <span>
-                共{recordsTotal}条记录,第{pagination.currentPage}/
-                {Math.ceil(recordsTotal / pagination.pageSize)}页
-              </span>
-            ),
-          }}
-          onChange={handleTableChange}
-          scroll={{ y: 700 }}
-        />
-      </div>
-      {modalVisible ? (
-        <Modal
-          title="银证转账"
-          visible={modalVisible}
-          centered
-          destroyOnClose
-          footer={false}
-          onCancel={() => setModalVisible(false)}
-        >
-          <Form layout="horizontal" labelCol={{ span: 5 }} form={addForm} onFinish={onFinish}>
-            <Form.Item label="资金账号">
-              <Form.Item name="investType" noStyle initialValue="1">
-                <Radio.Group onChange={handleCountChange}>
-                  <Radio.Button value="1">股票账号</Radio.Button>
-                  <Radio.Button value="2">基金账号</Radio.Button>
+      }
+    >
+      <>
+        <div>
+          <Table
+            columns={columns}
+            dataSource={moneyFlowingList}
+            pagination={{
+              showSizeChanger: true,
+              showQuickJumper: false,
+              total: recordsTotal,
+              current: pagination.currentPage,
+              showTotal: () => (
+                <span>
+                  共{recordsTotal}条记录,第{pagination.currentPage}/
+                  {Math.ceil(recordsTotal / pagination.pageSize)}页
+                </span>
+              ),
+            }}
+            onChange={handleTableChange}
+            scroll={{ y: 700 }}
+          />
+        </div>
+        {modalVisible ? (
+          <Modal
+            title="银证转账"
+            visible={modalVisible}
+            centered
+            destroyOnClose
+            footer={false}
+            onCancel={() => setModalVisible(false)}
+          >
+            <Form layout="horizontal" labelCol={{ span: 5 }} form={addForm} onFinish={onFinish}>
+              <Form.Item label="资金账号">
+                <Form.Item name="investType" noStyle initialValue="1">
+                  <Radio.Group onChange={handleCountChange}>
+                    <Radio.Button value="1">股票账号</Radio.Button>
+                    <Radio.Button value="2">基金账号</Radio.Button>
+                  </Radio.Group>
+                </Form.Item>
+                <span style={{ marginLeft: '0.4rem' }}>
+                  (当前余额：{formatMoney(restMoney, 2)})
+                </span>
+              </Form.Item>
+              <Form.Item name="createDate" label="转账时间">
+                <DatePicker />
+              </Form.Item>
+              <Form.Item name="moneyOpt" label="银证转账" initialValue="1">
+                <Radio.Group>
+                  <Radio.Button value="1">转入</Radio.Button>
+                  <Radio.Button value="0">转出</Radio.Button>
                 </Radio.Group>
               </Form.Item>
-              <span style={{ marginLeft: '0.4rem' }}>(当前余额：{formatMoney(restMoney, 2)})</span>
-            </Form.Item>
-            <Form.Item name="moneyOpt" label="银证转账" initialValue="1">
-              <Radio.Group>
-                <Radio.Button value="1">转入</Radio.Button>
-                <Radio.Button value="0">转出</Radio.Button>
-              </Radio.Group>
-            </Form.Item>
-            <Form.Item name="money" label="金额">
-              <Input placeholder="输入金额" suffix="元" />
-            </Form.Item>
-            <Form.Item>
-              <Button type="primary" htmlType="submit">
-                确认
-              </Button>
-            </Form.Item>
-          </Form>
-        </Modal>
-      ) : null}
-    </div>
+              <Form.Item name="money" label="金额">
+                <Input placeholder="输入金额" suffix="元" />
+              </Form.Item>
+              <Form.Item name="file" label="上传图片">
+                <Upload
+                  accept="image/*"
+                  action="/pamsystem/uploadFile"
+                  data={{ username: 'vincent' }}
+                  listType="picture-card"
+                  fileList={fileList}
+                  onPreview={handlePreview}
+                  onChange={handleChange}
+                >
+                  <Button type="primary">上传</Button>
+                </Upload>
+              </Form.Item>
+              <Form.Item>
+                <Button type="primary" htmlType="submit">
+                  确认
+                </Button>
+              </Form.Item>
+            </Form>
+          </Modal>
+        ) : null}
+        {previewVisible ? (
+          <Modal
+            visible={previewVisible}
+            title={previewInfo?.previewTitle || '图片预览'}
+            footer={null}
+            onCancel={() => {
+              setPreviewVisible(false);
+              setPreviewInfo({});
+            }}
+          >
+            <img alt="example" style={{ width: '100%' }} src={previewInfo?.previewImage || '#'} />
+          </Modal>
+        ) : null}
+      </>
+    </PageWrapper>
   );
 };
 

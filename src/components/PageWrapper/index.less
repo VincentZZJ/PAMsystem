@@ -1,0 +1,36 @@
+@import '../../baseStyles.less';
+
+.pageWrap {
+  height: 100%;
+  overflow: hidden;
+  .top {
+    display: flex;
+    justify-content: space-between;
+    height: unit(40 / @baseFontSize, rem);
+    padding: unit(2 / @baseFontSize, rem) 0;
+    border-bottom: 1px solid @border_color;
+    .headTitle {
+      font-weight: bold;
+      font-size: 1rem;
+    }
+  }
+  .btm {
+    height: calc(100% - 3rem);
+    overflow-y: auto;
+    &::-webkit-scrollbar {
+      width: unit(10 / @baseFontSize, rem);
+    }
+
+    /* 外层轨道 */
+    &::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 0;
+    }
+
+    /* 滚动条滑块 */
+    &::-webkit-scrollbar-thumb {
+      background: #a8a8a8;
+      border-radius: unit(10 / @baseFontSize, rem);
+    }
+  }
+}

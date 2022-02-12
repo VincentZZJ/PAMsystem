@@ -24,6 +24,7 @@ import {
   updatePriceByCodeService,
 } from '@/services/pamsystem/investmng';
 import IconFont from '@/components/IconFont';
+import PageWrapper from '@/components/PageWrapper';
 import { useModel, history } from 'umi';
 import { InvestType, InvestOpt } from '@/utils/constant';
 import { formatMoney } from '@/utils/utils';
@@ -459,8 +460,9 @@ const Page = () => {
   }, [searchParams, pagination, isRefresh, initialState]);
 
   return (
-    <div className={styles.wrap}>
-      <div className={styles.top}>
+    <PageWrapper
+      classNames={styles.wrap}
+      pageTitleCmp={
         <div>
           <span style={{ fontWeight: 'bold', fontSize: '1rem' }}>（金额单位：元）</span>
           <Popover
@@ -531,6 +533,8 @@ const Page = () => {
             </>
           ))} */}
         </div>
+      }
+      pageTitleExtraCmp={
         <div>
           <Form layout="inline" form={searchForm} onFinish={onSearchFun}>
             <Form.Item name="investName">
@@ -563,139 +567,142 @@ const Page = () => {
             </Form.Item>
           </Form>
         </div>
-      </div>
-      <div>
-        <Table
-          columns={columns}
-          dataSource={investList}
-          expandable={{
-            expandRowByClick: true,
-            expandedRowRender,
-            rowExpandable: (record) => record?.optHistory?.length > 0,
-          }}
-          rowKey={(record) => record.id}
-          pagination={{
-            showSizeChanger: true,
-            showQuickJumper: false,
-            total: recordsTotal,
-            current: pagination.currentPage,
-            showTotal: () => (
-              <span>
-                共{recordsTotal}条记录,第{pagination.currentPage}/
-                {Math.ceil(recordsTotal / pagination.pageSize)}页
-              </span>
-            ),
-          }}
-          onChange={handleTableChange}
-          scroll={{ y: 700 }}
-        />
-      </div>
-      {addModalVisible ? (
-        <Modal
-          title="新增投资项"
-          visible={addModalVisible}
-          destroyOnClose
-          closable
-          maskClosable={false}
-          footer={false}
-          centered
-          onCancel={() => {
-            setAddModalVisible(false);
-            addForm.resetFields();
-          }}
-        >
-          <Form name="addform" layout="vertical" form={addForm} onFinish={addFormFinish}>
-            <Form.Item label="投资类型" name="investType" required>
-              <Select placeholder="请选择投资类型">
-                {Object.keys(InvestType).map((item) => (
-                  <Option key={item} value={item}>
-                    {InvestType[item]}
-                  </Option>
-                ))}
-              </Select>
-            </Form.Item>
-            <Form.Item label="代码" name="code" required>
-              <Input placeholder="请输入投资代码(如：sh600789,sz001001)" />
-            </Form.Item>
-            <Form.Item label="名称" name="investName" required>
-              <Input placeholder="请输入名称" />
-            </Form.Item>
-            <Form.Item label="买入时间" name="buyTime" required>
-              <DatePicker style={{ width: '100%' }} />
-            </Form.Item>
-            <Form.Item label="买入价格" name="buyPrice" required>
-              <Input placeholder="买入价格" />
-            </Form.Item>
-            <Form.Item label="持仓" name="position" required>
-              <Input placeholder="持仓(最低100手)" suffix="手" />
-            </Form.Item>
-            <Form.Item label="投资金额" name="totalInvest" required>
-              <Input placeholder="投资金额" />
-            </Form.Item>
-            <Form.Item>
-              <Button htmlType="submit" type="primary">
-                确认
-              </Button>
-            </Form.Item>
-          </Form>
-        </Modal>
-      ) : null}
-      {updateModalVisible ? (
-        <Modal
-          title={`交易操作 —（${curRecord.investName}）`}
-          visible={updateModalVisible}
-          maskClosable={false}
-          destroyOnClose
-          closable
-          footer={false}
-          centered
-          onCancel={() => {
-            setUpdateModalVisible(false);
-            updateForm.resetFields();
-          }}
-        >
-          <Form name="updateform" form={updateForm} {...formLayouts} onFinish={updateFormFinish}>
-            <div className={styles.beforeOpt}>
-              当前成本：<span>{curRecord?.cost ?? '/'}元</span>持仓：
-              <span>{curRecord?.position ?? '/'}手</span>当前总投资：
-              <span>{curRecord?.totalInvest ?? '/'}元</span>
-            </div>
-            <Form.Item label="交易操作" name="investOpt" required initialValue="1">
-              <Radio.Group>
-                {Object.keys(InvestOpt).map((item) => (
-                  <Radio.Button value={item}>{InvestOpt[item]}</Radio.Button>
-                ))}
-              </Radio.Group>
-            </Form.Item>
-            <Form.Item label="成交时间" name="date" required>
-              <DatePicker style={{ width: '100%' }} />
-            </Form.Item>
-            <Form.Item label="交易价" name="investCost" required>
-              <Input placeholder="(加/减)价位" onChange={(ev) => handleInvestCostChange(ev)} />
-            </Form.Item>
-            <Form.Item label="交易量" name="investNum" required>
-              <Input
-                placeholder="(加/减)多少手 -- 最低100手"
-                suffix="手"
-                onChange={(ev) => handleInvestNumChange(ev)}
-              />
-            </Form.Item>
-            <div className={styles.afterOpt}>
-              更新成本：<span>{formatMoney(latestInfo?.latestCost)}元</span>更新总投资：
-              <span>{formatMoney(latestInfo?.totalInvest)}元</span>盈亏：
-              <span className={`${latestInfo?.profit > 0 ? 'redCls' : 'greenCls'}`}>
-                {formatMoney(latestInfo?.profit)}元
-              </span>
-            </div>
-            <Form.Item>
-              <Button htmlType="submit" type="primary">
-                确认
-              </Button>
-            </Form.Item>
-          </Form>
-        </Modal>
-      ) : null}
-    </div>
+      }
+    >
+      <>
+        <div>
+          <Table
+            columns={columns}
+            dataSource={investList}
+            expandable={{
+              expandRowByClick: true,
+              expandedRowRender,
+              rowExpandable: (record) => record?.optHistory?.length > 0,
+            }}
+            rowKey={(record) => record.id}
+            pagination={{
+              showSizeChanger: true,
+              showQuickJumper: false,
+              total: recordsTotal,
+              current: pagination.currentPage,
+              showTotal: () => (
+                <span>
+                  共{recordsTotal}条记录,第{pagination.currentPage}/
+                  {Math.ceil(recordsTotal / pagination.pageSize)}页
+                </span>
+              ),
+            }}
+            onChange={handleTableChange}
+            scroll={{ y: 700 }}
+          />
+        </div>
+        {addModalVisible ? (
+          <Modal
+            title="新增投资项"
+            visible={addModalVisible}
+            destroyOnClose
+            closable
+            maskClosable={false}
+            footer={false}
+            centered
+            onCancel={() => {
+              setAddModalVisible(false);
+              addForm.resetFields();
+            }}
+          >
+            <Form name="addform" layout="vertical" form={addForm} onFinish={addFormFinish}>
+              <Form.Item label="投资类型" name="investType" required>
+                <Select placeholder="请选择投资类型">
+                  {Object.keys(InvestType).map((item) => (
+                    <Option key={item} value={item}>
+                      {InvestType[item]}
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
+              <Form.Item label="代码" name="code" required>
+                <Input placeholder="请输入投资代码(如：sh600789,sz001001)" />
+              </Form.Item>
+              <Form.Item label="名称" name="investName" required>
+                <Input placeholder="请输入名称" />
+              </Form.Item>
+              <Form.Item label="买入时间" name="buyTime" required>
+                <DatePicker style={{ width: '100%' }} />
+              </Form.Item>
+              <Form.Item label="买入价格" name="buyPrice" required>
+                <Input placeholder="买入价格" />
+              </Form.Item>
+              <Form.Item label="持仓" name="position" required>
+                <Input placeholder="持仓(最低100手)" suffix="手" />
+              </Form.Item>
+              <Form.Item label="投资金额" name="totalInvest" required>
+                <Input placeholder="投资金额" />
+              </Form.Item>
+              <Form.Item>
+                <Button htmlType="submit" type="primary">
+                  确认
+                </Button>
+              </Form.Item>
+            </Form>
+          </Modal>
+        ) : null}
+        {updateModalVisible ? (
+          <Modal
+            title={`交易操作 —（${curRecord.investName}）`}
+            visible={updateModalVisible}
+            maskClosable={false}
+            destroyOnClose
+            closable
+            footer={false}
+            centered
+            onCancel={() => {
+              setUpdateModalVisible(false);
+              updateForm.resetFields();
+            }}
+          >
+            <Form name="updateform" form={updateForm} {...formLayouts} onFinish={updateFormFinish}>
+              <div className={styles.beforeOpt}>
+                当前成本：<span>{curRecord?.cost ?? '/'}元</span>持仓：
+                <span>{curRecord?.position ?? '/'}手</span>当前总投资：
+                <span>{curRecord?.totalInvest ?? '/'}元</span>
+              </div>
+              <Form.Item label="交易操作" name="investOpt" required initialValue="1">
+                <Radio.Group>
+                  {Object.keys(InvestOpt).map((item) => (
+                    <Radio.Button value={item}>{InvestOpt[item]}</Radio.Button>
+                  ))}
+                </Radio.Group>
+              </Form.Item>
+              <Form.Item label="成交时间" name="date" required>
+                <DatePicker style={{ width: '100%' }} />
+              </Form.Item>
+              <Form.Item label="交易价" name="investCost" required>
+                <Input placeholder="(加/减)价位" onChange={(ev) => handleInvestCostChange(ev)} />
+              </Form.Item>
+              <Form.Item label="交易量" name="investNum" required>
+                <Input
+                  placeholder="(加/减)多少手 -- 最低100手"
+                  suffix="手"
+                  onChange={(ev) => handleInvestNumChange(ev)}
+                />
+              </Form.Item>
+              <div className={styles.afterOpt}>
+                更新成本：<span>{formatMoney(latestInfo?.latestCost)}元</span>更新总投资：
+                <span>{formatMoney(latestInfo?.totalInvest)}元</span>盈亏：
+                <span className={`${latestInfo?.profit > 0 ? 'redCls' : 'greenCls'}`}>
+                  {formatMoney(latestInfo?.profit)}元
+                </span>
+              </div>
+              <Form.Item>
+                <Button htmlType="submit" type="primary">
+                  确认
+                </Button>
+              </Form.Item>
+            </Form>
+          </Modal>
+        ) : null}
+      </>
+    </PageWrapper>
   );
 };
 
