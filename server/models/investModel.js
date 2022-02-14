@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2022-01-10 15:45:58
- * @LastEditTime: 2022-01-30 00:20:43
+ * @LastEditTime: 2022-02-14 10:39:31
  * @LastEditors: Vincent
  * @Description:
  */
@@ -20,11 +20,29 @@ const InvestUserCount = Mysql.invest_usercount;
  * @return {*}
  */
 const addInvestItemModel = async (data) => {
+  const { buyTime, buyPrice, position } = data;
+  const itemId = UUID.v1();
   const isAdd = await InvestItem.create({
-    id: UUID.v1(),
+    id: itemId,
     ...data,
     status: 1,
     isDel: 0,
+  });
+  //   插入新的投资操作记录
+  const recordId = UUID.v1();
+  await InvestRecord.create({
+    id: recordId,
+    date: buyTime,
+    investOpt: 0,
+    investCost: buyPrice,
+    investNum: position,
+    latestCost: buyPrice,
+  });
+  //   插入记录成功后，更新关联表
+  await InvestHistory.create({
+    id: UUID.v1(),
+    itemId: itemId,
+    recordId: recordId,
   });
   return isAdd && isAdd.dataValues;
 };

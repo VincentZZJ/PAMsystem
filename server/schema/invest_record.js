@@ -15,7 +15,7 @@ module.exports = function(sequelize, DataTypes) {
     investOpt: {
       type: DataTypes.STRING(10),
       allowNull: false,
-      comment: "操作类型：1-加仓；2-减仓；3-清仓"
+      comment: "操作类型：0-买入；1-加仓；2-减仓；3-清仓"
     },
     investCost: {
       type: DataTypes.DOUBLE(13,3),
