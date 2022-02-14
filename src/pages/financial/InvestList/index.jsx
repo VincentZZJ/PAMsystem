@@ -81,16 +81,11 @@ const Page = () => {
       width: '7%',
       dataIndex: 'buyTime',
     },
-    {
-      title: '买入价格(元)',
-      dataIndex: 'buyPrice',
-      render: (text) => formatMoney(text),
-    },
-    {
-      title: '持仓(手)',
-      width: '6%',
-      dataIndex: 'position',
-    },
+    // {
+    //   title: '买入价格(元)',
+    //   dataIndex: 'buyPrice',
+    //   render: (text) => formatMoney(text),
+    // },
     {
       title: '成本(元)',
       width: '5%',
@@ -108,6 +103,11 @@ const Page = () => {
           </Tooltip>
         </span>
       ),
+    },
+    {
+      title: '持仓(手)',
+      width: '6%',
+      dataIndex: 'position',
     },
     {
       title: '投资金额(元)',
@@ -166,16 +166,16 @@ const Page = () => {
         </span>
       ),
     },
-    {
-      title: '盈亏率',
-      width: '6%',
-      render: (text, record) => {
-        const { totalMoney, profit } = record;
-        const totalInvest = totalMoney - profit;
-        const rate = (parseFloat(profit / totalInvest) * 100).toFixed(2);
-        return <span className={`${profit > 0 ? 'redCls' : 'greenCls'}`}>{`${rate}%`}</span>;
-      },
-    },
+    // {
+    //   title: '盈亏率',
+    //   width: '6%',
+    //   render: (text, record) => {
+    //     const { totalMoney, profit } = record;
+    //     const totalInvest = totalMoney - profit;
+    //     const rate = (parseFloat(profit / totalInvest) * 100).toFixed(2);
+    //     return <span className={`${profit > 0 ? 'redCls' : 'greenCls'}`}>{`${rate}%`}</span>;
+    //   },
+    // },
     {
       title: '操作',
       render: (text, record) => {
@@ -229,13 +229,13 @@ const Page = () => {
               padding: '0.2rem 0.5rem',
               borderRadius: '0.2rem',
               fontWeight: 'bold',
-              color: `${text === '1' ? 'red' : 'green'}`,
+              color: `${text === '2' ? 'green' : 'red'}`,
               // color: '#fff',
             }}
           >
             <IconFont
               style={{ fontSize: '1rem', marginRight: '0.5rem' }}
-              type={text === '1' ? 'icon-jiacang' : 'icon-jiancang'}
+              type={text === '2' ? 'icon-jiancang' : 'icon-jiacang'}
             />
             {InvestOpt[text]}
           </span>
@@ -486,6 +486,15 @@ const Page = () => {
                   </span>
                 </p>
                 <p>
+                  股票盈亏率：
+                  <span className={statInfo?.cumulativeStockProfit > 0 ? 'redCls' : 'greenCls'}>
+                    {formatMoney(
+                      (statInfo.cumulativeStockProfit / statInfo.investStockMoney) * 100,
+                    )}
+                    %
+                  </span>
+                </p>
+                <p>
                   基金总投资：
                   <span style={{ fontWeight: 'bold' }}>
                     {formatMoney(statInfo.investFundMoney)}元
@@ -497,11 +506,29 @@ const Page = () => {
                     {formatMoney(statInfo.cumulativeFundProfit)}元
                   </span>
                 </p>
+                <p>
+                  基金累计盈亏：
+                  <span className={statInfo?.cumulativeFundProfit > 0 ? 'redCls' : 'greenCls'}>
+                    {formatMoney((statInfo.cumulativeFundProfit / statInfo.investFundMoney) * 100)}%
+                  </span>
+                </p>
                 <Divider />
                 <p>
                   账户总投资：
                   <span style={{ fontWeight: 'bold' }}>
                     {formatMoney(statInfo.investStockMoney + statInfo.investFundMoney)}元
+                  </span>
+                </p>
+                <p>
+                  账户总市值：
+                  <span style={{ fontWeight: 'bold' }}>
+                    {formatMoney(
+                      statInfo.investStockMoney +
+                        statInfo.cumulativeStockProfit +
+                        statInfo.investFundMoney +
+                        statInfo.cumulativeFundProfit,
+                    )}
+                    元
                   </span>
                 </p>
                 <p>
@@ -514,6 +541,23 @@ const Page = () => {
                     }
                   >
                     {formatMoney(statInfo.cumulativeStockProfit + statInfo.cumulativeFundProfit)}元
+                  </span>
+                </p>
+                <p>
+                  盈亏率：
+                  <span
+                    className={
+                      statInfo?.cumulativeFundProfit + statInfo?.cumulativeStockProfit > 0
+                        ? 'redCls'
+                        : 'greenCls'
+                    }
+                  >
+                    {formatMoney(
+                      ((statInfo.cumulativeStockProfit + statInfo.cumulativeFundProfit) /
+                        (statInfo.investStockMoney + statInfo.investFundMoney)) *
+                        100,
+                    )}
+                    %
                   </span>
                 </p>
               </>
