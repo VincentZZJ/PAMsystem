@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2021-12-06 10:50:51
- * @LastEditTime: 2022-02-11 10:58:54
+ * @LastEditTime: 2022-02-16 15:22:28
  * @LastEditors: Vincent
  * @Description:
  */
@@ -85,7 +85,7 @@ export default [
       {
         path: '/diarymng',
         name: '日记管理',
-        icon: 'icon-touzi',
+        icon: 'icon-qunfariji',
         component: './diary',
         isRoutes: true,
       },

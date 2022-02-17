@@ -1,12 +1,13 @@
 /*
  * @Author: Vincent
  * @Date: 2022-02-12 15:06:26
- * @LastEditTime: 2022-02-12 17:07:43
+ * @LastEditTime: 2022-02-16 14:52:55
  * @LastEditors: Vincent
  * @Description:
  */
 
-const { Mysql } = require('../config/mysql');
+const { Mysql, PamDatabase } = require('../config/mysql');
+const sequelize = require('sequelize');
 const DiaryList = Mysql.diary_list;
 const AttachmentList = Mysql.attachment_list;
 
@@ -25,6 +26,19 @@ const getDiaryByOptionsModel = async (data) => {
     },
   });
   return diaryInfo;
+};
+
+/**
+ * @description: 获取当月日记录入情况
+ * @param {*}
+ * @return {*}
+ */
+const getDiaryStatByMonth = async (data) => {
+  const { userId, month } = data;
+  const diaryStat = await PamDatabase.query(
+    `select date,diaryTitle from diary_list where userId = '${userId}' AND DATE_FORMAT(date,'%Y-%m') = '${month}'`,
+  );
+  return diaryStat;
 };
 
 /**
@@ -110,4 +124,5 @@ module.exports = {
   getAttachmentListByDiaryIdModel,
   deleteDiaryByIdModel,
   saveDiaryInfoModel,
+  getDiaryStatByMonth,
 };

@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2022-01-22 15:02:50
- * @LastEditTime: 2022-02-11 11:03:28
+ * @LastEditTime: 2022-02-14 13:11:46
  * @LastEditors: Vincent
  * @Description:
  */
@@ -40,7 +40,7 @@ const Page = () => {
   const [isRefresh, setIsRefresh] = useState('');
   const [investType, setInvestType] = useState('');
   const [pagination, setPagination] = useState({ pageSize: 10, currentPage: 1 });
-  const [timeRange, setTimeRange] = useState([moment().subtract('M', 3), moment()]);
+  const [timeRange, setTimeRange] = useState([]);
   const [recordsTotal, setRecordsTotal] = useState(0);
   const [moneyFlowingList, setMoneyFlowingList] = useState([]);
   const [userCountInfo, setUserCountInfo] = useState({});
@@ -85,7 +85,12 @@ const Page = () => {
   //   表单提交
   const onFinish = async (values) => {
     try {
-      const result = await addMoneyFlowing({ ...values, userId: initialState.currentUser.userId });
+      const { createDate } = values;
+      const result = await addMoneyFlowing({
+        ...values,
+        createDate: createDate.format('YYYY-MM-DD'),
+        userId: initialState.currentUser.userId,
+      });
       if (result && result.code === '0') {
         message.success('操作成功');
         setIsRefresh(new Date().valueOf());
@@ -159,6 +164,7 @@ const Page = () => {
           userCountInfo = result.msg;
         }
         setUserCountInfo(userCountInfo);
+        setRestMoney(userCountInfo.stockCount);
       } catch (e) {
         console.log(e);
       }
@@ -190,7 +196,13 @@ const Page = () => {
             <Option value="2">基金账户</Option>
           </Select>
           <RangePicker value={timeRange} onChange={handleTimeChange} />
-          <Button type="primary" onClick={() => setModalVisible(true)}>
+          <Button
+            type="primary"
+            onClick={() => {
+              setModalVisible(true);
+              addForm.resetFields();
+            }}
+          >
             <PlusOutlined />
             银证转账
           </Button>
@@ -251,7 +263,7 @@ const Page = () => {
               <Form.Item name="money" label="金额">
                 <Input placeholder="输入金额" suffix="元" />
               </Form.Item>
-              <Form.Item name="file" label="上传图片">
+              {/* <Form.Item name="file" label="上传图片">
                 <Upload
                   accept="image/*"
                   action="/pamsystem/uploadFile"
@@ -263,7 +275,7 @@ const Page = () => {
                 >
                   <Button type="primary">上传</Button>
                 </Upload>
-              </Form.Item>
+              </Form.Item> */}
               <Form.Item>
                 <Button type="primary" htmlType="submit">
                   确认

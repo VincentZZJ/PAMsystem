@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2022-02-10 15:28:06
- * @LastEditTime: 2022-02-12 16:30:51
+ * @LastEditTime: 2022-02-16 14:53:55
  * @LastEditors: Vincent
  * @Description:
  */
@@ -10,6 +10,7 @@ const {
   getAttachmentListByDiaryIdModel,
   deleteDiaryByIdModel,
   saveDiaryInfoModel,
+  getDiaryStatByMonth,
 } = require('../models/diaryModel');
 const { setResponseBody } = require('../utils/utils');
 
@@ -19,7 +20,7 @@ const { setResponseBody } = require('../utils/utils');
  * @return {*}
  */
 const getDiaryByOptionsCtrl = async (ctx) => {
-  const { userId, date } = ctx.request.query;
+  const { userId, date, month } = ctx.request.query;
   try {
     //   获取日记对象
     const diaryRes = await getDiaryByOptionsModel({
@@ -29,6 +30,7 @@ const getDiaryByOptionsCtrl = async (ctx) => {
     const result = {
       diary: diaryRes,
       attachment: [],
+      diaryStat: [],
     };
     // 根据日记id，获取相应附件
     if (diaryRes && diaryRes.id) {
@@ -37,6 +39,12 @@ const getDiaryByOptionsCtrl = async (ctx) => {
       });
       result.attachment = attachRes || [];
     }
+    // 获取当月日记录入情况
+    const statRes = await getDiaryStatByMonth({
+      userId,
+      month,
+    });
+    result.diaryStat = statRes[0] || [];
     ctx.body = setResponseBody(result);
   } catch (e) {
     ctx.body = setResponseBody(e, '-1', '服务出错');

@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2022-02-11 10:23:48
- * @LastEditTime: 2022-02-12 17:21:08
+ * @LastEditTime: 2022-02-16 16:40:09
  * @LastEditors: Vincent
  * @Description:
  */
@@ -17,6 +17,7 @@ import {
   saveDiaryInfoService,
 } from '@/services/pamsystem/diarymng';
 import _ from 'lodash';
+import IconFont from '@/components/IconFont';
 import { shortLongText } from '@/utils/utils';
 import styles from './index.less';
 
@@ -28,6 +29,7 @@ const Page = () => {
   const [diaryInfo, setDiaryInfo] = useState({});
   const [showEditPage, setShowEditPage] = useState(false);
   const [isRefresh, setIsRefresh] = useState('');
+  const [monthData, setMonthData] = useState([]);
   const { initialState } = useModel('@@initialState');
   const [diaryForm] = Form.useForm();
 
@@ -72,12 +74,9 @@ const Page = () => {
       userId,
       date: curSelectedDate.format('YYYY-MM-DD'),
     };
+    const t = curSelectedDate.startOf('day').valueOf().toString();
     const diaryId =
-      diaryInfo?.id ||
-      `${userId.substring(0, userId.length - 8)}${moment()
-        .startOf('day')
-        .valueOf()
-        .substring(0, 8)}`;
+      diaryInfo?.id || `${userId.substring(0, userId.length - 8)}${t.substring(0, 8)}`;
     try {
       const result = await saveDiaryInfoService({ ...params, id: diaryId });
       if (result && result.code === '0') {
@@ -99,18 +98,43 @@ const Page = () => {
     diaryForm.setFieldsValue(diaryInfo ?? {});
   };
 
+  // 渲染日期框
+  const renderDateCellCmp = (date) => {
+    let info = '';
+    let dom = null;
+    if (curSelectedDate.month() === date.month() && moment().valueOf() >= date.valueOf()) {
+      monthData.forEach((item) => {
+        if (item.date === date.format('YYYY-MM-DD')) {
+          info = item.diaryTitle;
+        }
+      });
+      dom = (
+        <div style={{ textAlign: 'center' }}>
+          <Tooltip title={info ? `标题：${info}` : ''} placement="top">
+            <IconFont
+              type={info ? 'icon-yiwancheng' : 'icon-weiwancheng'}
+              style={{ color: `${info ? 'green' : 'red'}`, fontSize: '4rem' }}
+            />
+          </Tooltip>
+        </div>
+      );
+    }
+    return dom;
+  };
+
   useEffect(() => {
     // 日期发生变化后查询
     const fetchDiaryByDate = async (data) => {
       try {
         const result = await getDiaryByOptionsService(data);
         let _diaryInfo = {},
-          attachments = [];
-        debugger;
+          attachments = [],
+          _monthData = [];
         if (result && result.code === '0') {
-          const { diary = {}, attachment = [] } = result.msg;
+          const { diary = {}, attachment = [], diaryStat = [] } = result.msg;
           _diaryInfo = _.clone(diary);
           attachments = attachment;
+          _monthData = diaryStat;
         } else {
           message.warning(result?.desc || '获取失败');
         }
@@ -123,6 +147,7 @@ const Page = () => {
         // };
         setDiaryInfo(_diaryInfo);
         setAttachmentList(attachments);
+        setMonthData(_monthData);
       } catch (e) {
         console.log(e);
         message.error('服务出错，请联系运维人员');
@@ -131,6 +156,7 @@ const Page = () => {
     if (initialState?.currentUser?.userId) {
       fetchDiaryByDate({
         date: curSelectedDate.format('YYYY-MM-DD'),
+        month: curSelectedDate.format('YYYY-MM'),
         userId: initialState.currentUser.userId,
       });
     }
@@ -138,7 +164,9 @@ const Page = () => {
 
   return (
     <PageWrapper
-      pageTitleCmp={showEditPage ? '日记新增/修改' : '日记管理'}
+      pageTitleCmp={
+        showEditPage ? `日记新增/修改 - ${curSelectedDate.format('YYYY-MM-DD')}` : '日记管理'
+      }
       pageTitleExtraCmp={
         showEditPage ? (
           <>
@@ -160,7 +188,11 @@ const Page = () => {
         <div className={styles.contentWrap}>
           <div className={styles.contentTop}>
             <div>
-              <Calendar value={curSelectedDate} onSelect={handleCalendarSelect} />
+              <Calendar
+                value={curSelectedDate}
+                onSelect={handleCalendarSelect}
+                dateCellRender={renderDateCellCmp}
+              />
             </div>
             <div>
               <div className={styles.rightTop}>

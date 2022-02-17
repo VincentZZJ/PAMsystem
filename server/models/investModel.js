@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2022-01-10 15:45:58
- * @LastEditTime: 2022-02-14 10:39:31
+ * @LastEditTime: 2022-02-14 11:18:11
  * @LastEditors: Vincent
  * @Description:
  */
@@ -185,6 +185,11 @@ const addInvestRecordModel = async (data) => {
   return isDone;
 };
 
+/**
+ * @description: 更新最新价格
+ * @param {*} data
+ * @return {*}
+ */
 const updateLatestPriceModel = async (data) => {
   const { id, latestPrice, latestDate, profit, totalMoney } = data;
   const isUpdate = await InvestItem.update(
@@ -203,6 +208,11 @@ const updateLatestPriceModel = async (data) => {
   return isUpdate;
 };
 
+/**
+ * @description: 新增银证流水
+ * @param {*} data
+ * @return {*}
+ */
 const addMoneyFlowingModel = async (data) => {
   const isAdd = await InvestMoneyFlowing.create({
     id: UUID.v1(),
@@ -211,6 +221,11 @@ const addMoneyFlowingModel = async (data) => {
   return isAdd;
 };
 
+/**
+ * @description: 获取用户资金账号
+ * @param {*} data
+ * @return {*}
+ */
 const getUserCountInfoModel = async (data) => {
   const { userId } = data;
   const countInfo = await InvestUserCount.findOne({
@@ -231,18 +246,28 @@ const getUserCountInfoModel = async (data) => {
   return result;
 };
 
+/**
+ * @description: 获取用户银证流水清单
+ * @param {*} data
+ * @return {*}
+ */
 const getMoneyFlowingListModel = async (data) => {
   const { params, pagination } = data;
   const pageSize = parseInt(pagination.pageSize);
   const currentPage = parseInt(pagination.currentPage);
   const { startDate, endDate, userId, ...otherOpts } = params;
+  const searchOpt = {
+    userId,
+    ...otherOpts,
+  };
+  if (startDate && endDate) {
+    searchOpt.createDate = {
+      [sequelize.Op.between]: [startDate, endDate],
+    };
+  }
   const result = await InvestMoneyFlowing.findAndCountAll({
     where: {
-      userId,
-      ...otherOpts,
-      createDate: {
-        [sequelize.Op.between]: [startDate, endDate],
-      },
+      ...searchOpt,
     },
     order: [
       ['createDate', 'DESC'],
@@ -255,6 +280,11 @@ const getMoneyFlowingListModel = async (data) => {
   return result;
 };
 
+/**
+ * @description: 更新用户账号
+ * @param {*} data
+ * @return {*}
+ */
 const updateUserCountModel = async (data) => {
   const { userId, ...params } = data;
   const isUpdate = await InvestUserCount.update(
