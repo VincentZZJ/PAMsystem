@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2022-02-10 15:28:06
- * @LastEditTime: 2022-02-16 14:53:55
+ * @LastEditTime: 2022-02-18 17:31:32
  * @LastEditors: Vincent
  * @Description:
  */
@@ -11,8 +11,13 @@ const {
   deleteDiaryByIdModel,
   saveDiaryInfoModel,
   getDiaryStatByMonth,
+  saveFileToDiaryModel,
+  delFileByIdModel,
 } = require('../models/diaryModel');
 const { setResponseBody } = require('../utils/utils');
+const fsPromise = require('fs').promises;
+// const fs = require('fs');
+const path = require('path');
 
 /**
  * @description: 根据条件获取日记记录
@@ -84,8 +89,63 @@ const saveDiaryInfoCtrl = async (ctx) => {
   }
 };
 
+/**
+ * @description: 文件上传(图片)
+ * @param {*} ctx
+ * @return {*}
+ */
+const uploadFileCtrl = async (ctx) => {
+  const { username, diaryId } = ctx.request.body;
+  const { file } = ctx.request;
+  try {
+    const newPath = path.join(__dirname, `../statics/${username}`);
+    const serverUrl = `/photo/${username}/${file.filename}`;
+    let isSave = false;
+    await fsPromise
+      .access(newPath)
+      .then(async () => {
+        isSave = true;
+        await fsPromise.rename(file.path, `${newPath}/${file.filename}`);
+      })
+      .catch(async (err) => {
+        await fsPromise.mkdir(newPath);
+        isSave = true;
+        await fsPromise.rename(file.path, `${newPath}/${file.filename}`);
+      });
+    const data = {
+      diaryId,
+      fileUrl: serverUrl,
+      filePath: newPath,
+    };
+    isSave = await saveFileToDiaryModel(data);
+    if (isSave) {
+      ctx.body = setResponseBody(serverUrl);
+    } else {
+      ctx.body = setResponseBody({}, '-1', '上传失败');
+    }
+  } catch (e) {
+    ctx.body = setResponseBody(e, '-1', '服务出错');
+  }
+};
+
+const delFileByIdCtrl = async (ctx) => {
+  const { id } = ctx.request.query;
+  try {
+    const isDel = await delFileByIdModel(id);
+    if (isDel) {
+      ctx.body = setResponseBody();
+    } else {
+      ctx.body = setResponseBody({}, '-1', '删除失败');
+    }
+  } catch (e) {
+    ctx.body = setResponseBody(e, '-1', '服务出错');
+  }
+};
+
 module.exports = {
   getDiaryByOptionsCtrl,
   deleteDiaryByIdCtrl,
   saveDiaryInfoCtrl,
+  uploadFileCtrl,
+  delFileByIdCtrl,
 };

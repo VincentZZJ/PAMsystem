@@ -1,24 +1,37 @@
 /*
  * @Author: Vincent
  * @Date: 2022-02-11 10:23:48
- * @LastEditTime: 2022-02-16 16:40:09
+ * @LastEditTime: 2022-02-18 17:35:49
  * @LastEditors: Vincent
  * @Description:
  */
 import React, { useEffect, useState } from 'react';
 import PageWrapper from '@/components/PageWrapper';
-import { Button, Calendar, Empty, Image, Tooltip, Popconfirm, Form, Input, message } from 'antd';
+import {
+  Button,
+  Calendar,
+  Empty,
+  Image,
+  Tooltip,
+  Popconfirm,
+  Form,
+  Input,
+  message,
+  Upload,
+  Modal,
+} from 'antd';
 import moment from 'moment';
 import { useModel } from 'umi';
-import { FormOutlined, DeleteOutlined } from '@ant-design/icons';
+import { FormOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import {
   getDiaryByOptionsService,
   deleteDiaryByIdService,
   saveDiaryInfoService,
+  deleteAttachmentByIdService,
 } from '@/services/pamsystem/diarymng';
 import _ from 'lodash';
 import IconFont from '@/components/IconFont';
-import { shortLongText } from '@/utils/utils';
+import { shortLongText, getBase64 } from '@/utils/utils';
 import styles from './index.less';
 
 const { TextArea } = Input;
@@ -31,6 +44,9 @@ const Page = () => {
   const [isRefresh, setIsRefresh] = useState('');
   const [monthData, setMonthData] = useState([]);
   const { initialState } = useModel('@@initialState');
+  const [fileList, setFileList] = useState([]);
+  const [previewVisible, setPreviewVisible] = useState(false);
+  const [previewInfo, setPreviewInfo] = useState({});
   const [diaryForm] = Form.useForm();
 
   // 选择日期
@@ -74,9 +90,7 @@ const Page = () => {
       userId,
       date: curSelectedDate.format('YYYY-MM-DD'),
     };
-    const t = curSelectedDate.startOf('day').valueOf().toString();
-    const diaryId =
-      diaryInfo?.id || `${userId.substring(0, userId.length - 8)}${t.substring(0, 8)}`;
+    const diaryId = diaryInfo?.id || createDiaryId();
     try {
       const result = await saveDiaryInfoService({ ...params, id: diaryId });
       if (result && result.code === '0') {
@@ -91,9 +105,28 @@ const Page = () => {
     }
   };
 
+  // 新生成日记id（userId后8位拼接当日时间戳前8位）
+  const createDiaryId = () => {
+    const userId = initialState.currentUser.userId;
+    const t = curSelectedDate.startOf('day').valueOf().toString();
+    return `${userId.substring(0, userId.length - 8)}${t.substring(0, 8)}`;
+  };
+
   // 新增或修改日记
   const handleShowEdit = () => {
     setShowEditPage(true);
+    const list = [];
+    if (attachmentList?.length > 0) {
+      attachmentList.forEach((item) => {
+        list.push({
+          ...item,
+          uuid: item.id,
+          status: 'done',
+          url: item.fileUrl,
+        });
+      });
+    }
+    setFileList(list);
     diaryForm.resetFields();
     diaryForm.setFieldsValue(diaryInfo ?? {});
   };
@@ -120,6 +153,38 @@ const Page = () => {
       );
     }
     return dom;
+  };
+
+  // 更新图片列表
+  const handleChange = ({ fileList }) => setFileList(fileList);
+
+  // 图片预览
+  const handlePreview = async (file) => {
+    if (!file.url && !file.preview) {
+      file.preview = await getBase64(file.originFileObj);
+    }
+    setPreviewVisible(true);
+    setPreviewInfo({
+      previewImage: file.url || file.preview,
+      previewTitle: file.name || file.url.substring(file.url.lastIndexOf('/') + 1),
+    });
+  };
+
+  // 图片移除
+  const handleRemove = async (file) => {
+    const { uuid } = file;
+    try {
+      const res = await deleteAttachmentByIdService(uuid);
+      if (res && res.code === '0') {
+        message.success('删除成功');
+      } else {
+        message.warning(res?.desc || '删除失败');
+        return false;
+      }
+    } catch (e) {
+      console.log(e);
+      message.error('服务出错');
+    }
   };
 
   useEffect(() => {
@@ -235,7 +300,7 @@ const Page = () => {
             {attachmentList.length > 0 ? (
               <Image.PreviewGroup>
                 {attachmentList.map((item) => (
-                  <Image className={styles.imageCls} src={item.attachmentServerPath} />
+                  <Image className={styles.imageCls} src={item.fileUrl} />
                 ))}
               </Image.PreviewGroup>
             ) : (
@@ -267,10 +332,41 @@ const Page = () => {
           </div>
           <div>
             <div className={styles.rightTop}>上传附件</div>
-            <div>{/* <img src="/photo/vincent/test-17ee37a0e39.png" /> */}</div>
+            <div>
+              <Upload
+                accept="image/*"
+                action="/pamsystem/uploadFile"
+                data={{ username: 'vincent', diaryId: diaryInfo?.id || createDiaryId() }}
+                listType="picture-card"
+                fileList={fileList}
+                onPreview={handlePreview}
+                onChange={handleChange}
+                onRemove={handleRemove}
+              >
+                <Tooltip title="上传附件" placement="right">
+                  <PlusOutlined style={{ fontSize: '3rem' }} />
+                </Tooltip>
+              </Upload>
+            </div>
           </div>
         </div>
       )}
+      {previewVisible ? (
+        <Modal
+          visible={previewVisible}
+          title={previewInfo?.previewTitle || '图片预览'}
+          footer={null}
+          className={styles.modelCls}
+          maskClosable={false}
+          destroyOnClose
+          onCancel={() => {
+            setPreviewVisible(false);
+            setPreviewInfo({});
+          }}
+        >
+          <img alt="example" style={{ width: '100%' }} src={previewInfo?.previewImage || '#'} />
+        </Modal>
+      ) : null}
     </PageWrapper>
   );
 };

@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2021-12-07 14:12:16
- * @LastEditTime: 2022-02-12 15:52:32
+ * @LastEditTime: 2022-02-18 17:37:30
  * @LastEditors: Vincent
  * @Description: 接口映射
  */
@@ -72,7 +72,7 @@ router.get('/investmng/getUserCountById', investCtrl.getUserCountInfoCtrl);
 router.post('/investmng/addmoneyflowing', investCtrl.addMoneyFlowingCtrl);
 
 // 上传文件接口(接收file命名的字段)
-router.post('/uploadFile', uploader.single('file'), investCtrl.uploadFileCtrl);
+router.post('/uploadFile', uploader.single('file'), diaryCtrl.uploadFileCtrl);
 
 // 根据条件获取日记记录
 router.get('/diarymng/getDiaryByOptions', diaryCtrl.getDiaryByOptionsCtrl);
@@ -82,5 +82,8 @@ router.delete('/diarymng/deleteDiaryById', diaryCtrl.deleteDiaryByIdCtrl);
 
 // 保存日记
 router.post('/diarymng/saveDiaryInfo', diaryCtrl.saveDiaryInfoCtrl);
+
+// 根据文件id移除文件
+router.delete('/diarymng/delAttachmentById', diaryCtrl.delFileByIdCtrl);
 
 module.exports = router;

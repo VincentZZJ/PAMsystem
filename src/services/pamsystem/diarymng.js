@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2022-02-11 19:55:16
- * @LastEditTime: 2022-02-12 15:40:32
+ * @LastEditTime: 2022-02-18 17:33:34
  * @LastEditors: Vincent
  * @Description:
  */
@@ -25,5 +25,11 @@ export async function saveDiaryInfoService(data) {
   return request(`/pamsystem/diarymng/saveDiaryInfo`, {
     method: 'post',
     data,
+  });
+}
+
+export async function deleteAttachmentByIdService(id) {
+  return request(`/pamsystem/diarymng/delAttachmentById?id=${id}`, {
+    method: 'delete',
   });
 }

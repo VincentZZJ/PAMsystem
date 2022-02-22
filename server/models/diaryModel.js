@@ -1,13 +1,14 @@
 /*
  * @Author: Vincent
  * @Date: 2022-02-12 15:06:26
- * @LastEditTime: 2022-02-16 14:52:55
+ * @LastEditTime: 2022-02-18 17:29:40
  * @LastEditors: Vincent
  * @Description:
  */
 
 const { Mysql, PamDatabase } = require('../config/mysql');
 const sequelize = require('sequelize');
+const UUID = require('node-uuid');
 const DiaryList = Mysql.diary_list;
 const AttachmentList = Mysql.attachment_list;
 
@@ -53,6 +54,7 @@ const getAttachmentListByDiaryIdModel = async (data) => {
       diaryId,
       isDel: 0,
     },
+    attributes: ['id', 'fileUrl'],
   });
   return attachments;
 };
@@ -86,6 +88,11 @@ const deleteDiaryByIdModel = async (id) => {
   return true;
 };
 
+/**
+ * @description: 保存日记信息
+ * @param {*} data
+ * @return {*}
+ */
 const saveDiaryInfoModel = async (data) => {
   const { id, diaryTitle, diaryContent, date, userId } = data;
   const hasDiary = await DiaryList.findOne({
@@ -119,10 +126,39 @@ const saveDiaryInfoModel = async (data) => {
   return true;
 };
 
+/**
+ * @description: 保存图片信息
+ * @param {*} data
+ * @return {*}
+ */
+const saveFileToDiaryModel = async (data) => {
+  const isSave = await AttachmentList.create({
+    id: UUID.v1(),
+    ...data,
+  });
+  return isSave;
+};
+
+const delFileByIdModel = async (id) => {
+  const isDel = await AttachmentList.update(
+    {
+      isDel: 1,
+    },
+    {
+      where: {
+        id,
+      },
+    },
+  );
+  return isDel;
+};
+
 module.exports = {
   getDiaryByOptionsModel,
   getAttachmentListByDiaryIdModel,
   deleteDiaryByIdModel,
   saveDiaryInfoModel,
   getDiaryStatByMonth,
+  saveFileToDiaryModel,
+  delFileByIdModel,
 };
