@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2021-12-21 14:48:11
- * @LastEditTime: 2022-02-12 17:02:21
+ * @LastEditTime: 2022-02-24 10:38:55
  * @LastEditors: Vincent
  * @Description:
  */
@@ -48,6 +48,7 @@ export const getBase64 = (file) => {
   });
 };
 
+// 字符串长度截取
 export const shortLongText = (text, len) => {
   if (text.length > len) {
     return text.substring(0, len) + '...';

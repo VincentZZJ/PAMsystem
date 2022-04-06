@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2021-12-07 14:10:37
- * @LastEditTime: 2021-12-24 13:33:48
+ * @LastEditTime: 2022-03-28 16:49:52
  * @LastEditors: Vincent
  * @Description:
  */
@@ -12,6 +12,10 @@ const {
   updateUserInfoModel,
 } = require('../models/userModel');
 const { setResponseBody } = require('../utils/utils');
+const Redis = require('koa-redis');
+
+// 新建redis客户端
+const Store = new Redis().client;
 
 /**
  * @description: 登录
@@ -23,6 +27,8 @@ const userLoginCtrl = async (ctx) => {
   try {
     const result = await getUserByUserphoneModel(phone);
     if (result && result.password === password) {
+      // await Store.set(result.username, result.id);
+      // await Store.expire(result.username, 60);
       ctx.body = setResponseBody({ phone, username: result.username, userId: result.id });
     } else {
       ctx.body = setResponseBody({}, '-1', '账号密码错误');

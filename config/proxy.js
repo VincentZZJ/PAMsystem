@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2021-12-06 10:50:51
- * @LastEditTime: 2022-02-12 14:48:06
+ * @LastEditTime: 2022-03-29 15:19:37
  * @LastEditors: Vincent
  * @Description:
  */
@@ -33,6 +33,10 @@ export default {
       pathRewrite: {
         '^/photo': '',
       },
+    },
+    '/chatroom_socket': {
+      target: 'http://localhost:9016',
+      changeOrigin: true,
     },
   },
   test: {

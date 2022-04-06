@@ -1,7 +1,7 @@
 <!--
  * @Author: Vincent
  * @Date: 2021-12-07 14:56:21
- * @LastEditTime: 2022-02-22 11:10:10
+ * @LastEditTime: 2022-03-28 16:32:23
  * @LastEditors: Vincent
  * @Description: 后台服务
 -->
@@ -19,3 +19,5 @@
 - 设想：1、redis 实现 token 的保留，验证 token 有效性；2、redis 搭配 websocket 实现消息发布和订阅
 
 ## 使用 websocket 实现即时通信
+
+## 图片的 id 可以使用 file_md5 来做唯一处理

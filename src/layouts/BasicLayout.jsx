@@ -1,3 +1,10 @@
+/*
+ * @Author: Vincent
+ * @Date: 2021-12-31 17:13:48
+ * @LastEditTime: 2022-04-01 10:34:21
+ * @LastEditors: Vincent
+ * @Description:
+ */
 import React, { useEffect, useState } from 'react';
 import { Menu } from 'antd';
 import { UserOutlined, LogoutOutlined } from '@ant-design/icons';
@@ -12,12 +19,15 @@ const BasicLayout = (props) => {
   const [menuConfig, setMenuConfig] = useState([]);
   const { children, route } = props;
   const { currentUser } = initialState;
-  console.log(props);
   // 退出登录
   const logoutFun = async () => {
     await setInitialState((s) => ({ ...s, currentUser: undefined }));
     localStorage.removeItem('userInfo');
     history.push('/usercenter/login');
+    if (window.wsServer) {
+      window.wsServer.close();
+      window.wsServer = null;
+    }
   };
 
   // 动态渲染菜单
@@ -54,11 +64,29 @@ const BasicLayout = (props) => {
     history.push(key);
   };
 
+  // 建立websocket连接
+  const initWebsocket = () => {
+    debugger;
+    if (!window.wsServer) {
+      window.wsServer = new WebSocket(
+        `ws://${window.location.hostname}:3030/chatroom?userId=${initialState.currentUser.userId}`,
+      );
+    }
+  };
+
   useEffect(() => {
+    // 给window添加事件
+    window.onbeforeunload = () => {
+      if (window.wsServer) {
+        window.wsServer.close();
+        window.wsServer = null;
+      }
+    };
     // 菜单渲染(根据路由配置动态渲染)
     const routesConfig = route?.children?.filter((item) => item.isRoutes === true) || [];
     setMenuConfig(routesConfig);
     setInitialState((s) => ({ ...s, routeConfig: route }));
+    initWebsocket();
   }, []);
 
   return (

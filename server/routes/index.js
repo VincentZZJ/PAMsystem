@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2021-12-07 14:12:16
- * @LastEditTime: 2022-02-18 17:37:30
+ * @LastEditTime: 2022-04-02 19:08:51
  * @LastEditors: Vincent
  * @Description: 接口映射
  */
@@ -14,6 +14,7 @@ const path = require('path');
 const userCtrl = require('../controllers/userCtrl');
 const investCtrl = require('../controllers/investCtrl');
 const diaryCtrl = require('../controllers/diaryCtrl');
+const chatRoomCtrl = require('../controllers/chatRoomCtrl');
 
 // 上传文件存放路径及文件命名
 const storage = multer.diskStorage({
@@ -85,5 +86,14 @@ router.post('/diarymng/saveDiaryInfo', diaryCtrl.saveDiaryInfoCtrl);
 
 // 根据文件id移除文件
 router.delete('/diarymng/delAttachmentById', diaryCtrl.delFileByIdCtrl);
+
+// 根据userId查询聊天室列表
+router.get('/chatroom/getRoomList', chatRoomCtrl.getRoomListCtrl);
+
+// 根据手机号查询好友
+router.get('/chatroom/searchFriend', chatRoomCtrl.searchFriendsCtrl);
+
+// 添加好友
+router.post('/chatroom/addFriend', chatRoomCtrl.addFriendCtrl);
 
 module.exports = router;

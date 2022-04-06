@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2021-12-06 10:50:51
- * @LastEditTime: 2022-02-16 15:22:28
+ * @LastEditTime: 2022-03-24 10:52:14
  * @LastEditors: Vincent
  * @Description:
  */
@@ -87,6 +87,13 @@ export default [
         name: '日记管理',
         icon: 'icon-qunfariji',
         component: './diary',
+        isRoutes: true,
+      },
+      {
+        path: '/chatroom',
+        name: '聊天室',
+        icon: 'icon-qunfariji',
+        component: './chatroom',
         isRoutes: true,
       },
       {

@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2022-02-10 15:28:06
- * @LastEditTime: 2022-02-18 17:31:32
+ * @LastEditTime: 2022-02-24 11:04:40
  * @LastEditors: Vincent
  * @Description:
  */
@@ -128,6 +128,11 @@ const uploadFileCtrl = async (ctx) => {
   }
 };
 
+/**
+ * @description: 根据文件id删除
+ * @param {*} ctx
+ * @return {*}
+ */
 const delFileByIdCtrl = async (ctx) => {
   const { id } = ctx.request.query;
   try {
