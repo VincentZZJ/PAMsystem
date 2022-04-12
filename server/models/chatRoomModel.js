@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2022-03-28 17:18:03
- * @LastEditTime: 2022-04-06 10:51:03
+ * @LastEditTime: 2022-04-07 15:50:11
  * @LastEditors: Vincent
  * @Description:
  */
@@ -58,8 +58,7 @@ const searchFriendsModel = async ({ phone }) => {
   }
 };
 
-const addFriendModel = async ({ friendId, userId, addMsg, msgTime }) => {
-  const roomId = UUID.v1();
+const addFriendModel = async ({ friendId, userId, addMsg, msgTime, roomId }) => {
   await UserAndRoom.create({
     id: UUID.v1(),
     userId,

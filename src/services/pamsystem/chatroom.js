@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2022-03-26 14:44:15
- * @LastEditTime: 2022-04-06 10:31:56
+ * @LastEditTime: 2022-04-07 16:57:26
  * @LastEditors: Vincent
  * @Description:
  */
@@ -15,7 +15,7 @@ export async function getChatRoomListService(id) {
 
 // 根据聊天室id获取聊天室信息
 export async function getChatRoomInfoService(id) {
-  return request(`/pamsystem/chatroom/getChatUserList?roomId=${id}`);
+  return request(`/pamsystem/chatroom/getChatMsgList?roomId=${id}`);
 }
 
 // 添加好友

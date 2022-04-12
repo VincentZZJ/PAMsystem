@@ -1,15 +1,17 @@
 /*
  * @Author: Vincent
  * @Date: 2022-03-29 18:11:34
- * @LastEditTime: 2022-04-01 10:56:49
+ * @LastEditTime: 2022-04-09 15:41:04
  * @LastEditors: Vincent
  * @Description: websocket管理
  */
 const ws = require('nodejs-websocket');
+const { Mysql } = require('./config/mysql');
+const UserAndRoom = Mysql.user_and_room;
 
 const WebSocket = function () {
   this.wsServer = null;
-  this.onlineUsers = [];
+  this.onlineUsers = new Map();
   return this;
 };
 
@@ -21,24 +23,22 @@ WebSocket.prototype = {
       .createServer((socket) => {
         //   动态监听在线用户
         const curUserId = this.userOnlineMng(socket.path);
-        if (!this.onlineUsers.includes(curUserId)) {
-          this.onlineUsers.push(curUserId);
+        if (!this.onlineUsers.has(curUserId)) {
+          this.onlineUsers.set(curUserId, socket);
         }
         // 断开连接
         socket.on('close', (code) => {
           console.log('ws服务已断开', this);
-          const index = this.onlineUsers.indexOf(curUserId);
-          if (index !== -1) {
-            this.onlineUsers.splice(index, 1);
+          if (this.onlineUsers.has(curUserId)) {
+            this.onlineUsers.delete(curUserId);
           }
         });
         // 异常断开
         socket.on('error', (code) => {
           try {
             socket.close();
-            const index = this.onlineUsers.indexOf(curUserId);
-            if (index !== -1) {
-              this.onlineUsers.splice(index, 1);
+            if (this.onlineUsers.has(curUserId)) {
+              this.onlineUsers.delete(curUserId);
             }
           } catch (err) {
             console.log('ws断开异常', err);
@@ -46,8 +46,23 @@ WebSocket.prototype = {
           console.log('ws服务异常断开', code);
         });
         // 消息订阅
-        socket.on('text', (msg) => {
-          console.log(msg);
+        socket.on('text', async (msg) => {
+          const msgInfo = JSON.parse(msg);
+          // 聊天即时讯息接受
+          if (msgInfo.msgPath === 'chatroommsg') {
+            const { roomId } = msgInfo.msgData;
+            const userList = await UserAndRoom.findAll({
+              attributes: ['userId'],
+              where: {
+                roomId,
+              },
+            });
+            userList.forEach((item) => {
+              if (this.onlineUsers.has(item.userId)) {
+                this.onlineUsers.get(item.userId).sendText(JSON.stringify(msgInfo.msgData));
+              }
+            });
+          }
         });
         console.log(this);
       })
@@ -79,9 +94,6 @@ WebSocket.prototype = {
       const strArray = path.split('userId=');
       if (strArray.length > 0) {
         curUserId = strArray[strArray.length - 1];
-        if (!this.onlineUsers.includes(curUserId)) {
-          this.onlineUsers.push(curUserId);
-        }
       }
     }
     return curUserId;

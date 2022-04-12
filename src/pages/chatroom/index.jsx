@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2022-03-24 10:47:57
- * @LastEditTime: 2022-04-06 11:21:17
+ * @LastEditTime: 2022-04-11 13:40:41
  * @LastEditors: Vincent
  * @Description:
  */
@@ -25,6 +25,7 @@ import {
   addFriendsService,
   searchFriendsService,
 } from '@/services/pamsystem/chatroom';
+import { formatMsgModel, initWebsocket } from '@/utils/websocket';
 import moment from 'moment';
 import styles from './index.less';
 
@@ -94,6 +95,8 @@ const Page = () => {
   const [searchFriends, setSearchFriends] = useState([]);
   const [selectedFriend, setSelectedFriend] = useState({});
   const { initialState } = useModel('@@initialState');
+  // const { msgList } = useModel('useChatRoomModel', (model) => ({ msgList: model.msgList }));
+  const [curMsgList, setCurMsgList] = useState([]);
   const [isRefresh, setIsRefresh] = useState(new Date().valueOf());
 
   //   搜索框查询
@@ -103,7 +106,18 @@ const Page = () => {
 
   //   消息发送
   const handleMsgSend = (val) => {
-    console.log(val);
+    const userId = initialState.currentUser.userId;
+    if (window.wsServer && window.wsServer.readyState == WebSocket.OPEN) {
+      const msgData = {
+        roomId: curChatRoom.id,
+        msgFrom: userId,
+        msgTime: moment().format('YYYY-MM-DD HH:mm:ss'),
+        msg: val.msg,
+      };
+      window.wsServer.send(JSON.stringify(formatMsgModel('chatroommsg', msgData)));
+    } else {
+      initWebsocket(window.location.hostname, userId);
+    }
   };
 
   //   查找好友
@@ -146,22 +160,24 @@ const Page = () => {
   };
 
   //   点击切换聊天窗口
-  const handleMsgChange = (msgInfo) => {
+  const handleMsgChange = async (msgInfo) => {
     if (msgInfo?.id) {
-      setCurChatRoom(msgInfo);
-      // try {
-      //   const response = await getChatRoomInfoService(msgInfo.roomId);
-      //   let roomInfo = {};
-      //   if (response && response.code === '0') {
-      //     roomInfo = response.msg;
-      //   }
-      //   setCurChatRoom(roomInfo);
-      // } catch (e) {
-      //   message.error('操作失败');
-      //   console.log(e);
-      // }
+      try {
+        const response = await getChatRoomInfoService(msgInfo.id);
+        setCurMsgList(response?.msg ?? []);
+      } catch (e) {
+        message.error('操作失败');
+        console.log(e);
+      }
     }
   };
+
+  // useEffect(() => {
+  //   if (msgList?.length > 0) {
+  //     const list = msgList.filter((item) => item.id === curChatRoom.id);
+  //     setCurMsgList(list);
+  //   }
+  // }, [msgList]);
 
   useEffect(() => {
     //   获取用户列表
@@ -202,12 +218,12 @@ const Page = () => {
                 <div>{curChatRoom?.userList?.length > 1 ? <UserOutlined /> : <TeamOutlined />}</div>
               </div>
               <div className={styles.contentWindow}>
-                {curChatRoom?.msgList?.length > 0
-                  ? curChatRoom.msgList.map((item) => {
+                {curMsgList?.length > 0
+                  ? curMsgList.map((item) => {
                       const itemCls =
-                        item.userId === initialState.currentUser.userId
-                          ? styles.onLeftRender
-                          : styles.onRightRender;
+                        item.msgfrom === initialState.currentUser.userId
+                          ? styles.onRightRender
+                          : styles.onLeftRender;
                       return (
                         <div className={`${styles.msgItemBox} ${itemCls}`}>
                           <div>
@@ -215,7 +231,7 @@ const Page = () => {
                           </div>
                           <div>
                             {/* <span>{item.msgTime}</span> */}
-                            <p>{item.msgContent}</p>
+                            <p>{item.msg}</p>
                           </div>
                         </div>
                       );

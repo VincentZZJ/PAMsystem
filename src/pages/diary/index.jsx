@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2022-02-11 10:23:48
- * @LastEditTime: 2022-02-18 17:35:49
+ * @LastEditTime: 2022-04-06 15:57:32
  * @LastEditors: Vincent
  * @Description:
  */
@@ -336,7 +336,10 @@ const Page = () => {
               <Upload
                 accept="image/*"
                 action="/pamsystem/uploadFile"
-                data={{ username: 'vincent', diaryId: diaryInfo?.id || createDiaryId() }}
+                data={{
+                  phone: initialState.currentUser.phone,
+                  diaryId: diaryInfo?.id || createDiaryId(),
+                }}
                 listType="picture-card"
                 fileList={fileList}
                 onPreview={handlePreview}

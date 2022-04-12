@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2022-02-10 15:28:06
- * @LastEditTime: 2022-02-24 11:04:40
+ * @LastEditTime: 2022-04-06 16:06:21
  * @LastEditors: Vincent
  * @Description:
  */
@@ -95,11 +95,11 @@ const saveDiaryInfoCtrl = async (ctx) => {
  * @return {*}
  */
 const uploadFileCtrl = async (ctx) => {
-  const { username, diaryId } = ctx.request.body;
+  const { phone, diaryId } = ctx.request.body;
   const { file } = ctx.request;
   try {
-    const newPath = path.join(__dirname, `../statics/${username}`);
-    const serverUrl = `/photo/${username}/${file.filename}`;
+    const newPath = path.join(__dirname, `../statics/databackup/pamid_${phone}/files`);
+    const serverUrl = `/photo/pamid_${phone}/files/${file.filename}`;
     let isSave = false;
     await fsPromise
       .access(newPath)

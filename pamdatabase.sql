@@ -11,7 +11,7 @@
  Target Server Version : 80018
  File Encoding         : 65001
 
- Date: 24/02/2022 19:06:21
+ Date: 12/04/2022 19:57:17
 */
 
 SET NAMES utf8mb4;
@@ -39,6 +39,25 @@ INSERT INTO `attachment_list` VALUES ('a807eb10-9099-11ec-ab1a-9f79fc8de9f8', '8
 INSERT INTO `attachment_list` VALUES ('bde8a0c0-909c-11ec-81f7-df5fefcf7eb2', '8200cf50-78ce-11ec-a8a0-ed6c16451136', '/photo/vincent/单块砖、石材空鼓-无-未针对工程进度状况开展风险识别及后续风险管理-17f0c26c45f.jpg', 'c:\\zzjFiles\\vincent\\个人事务管理系统\\code\\pamsystem\\server\\statics\\vincent', 0);
 INSERT INTO `attachment_list` VALUES ('c26faf80-909c-11ec-81f7-df5fefcf7eb2', '8200cf50-78ce-11ec-a8a0-ed6c16451136', '/photo/vincent/test-17f0c26e272.png', 'c:\\zzjFiles\\vincent\\个人事务管理系统\\code\\pamsystem\\server\\statics\\vincent', 0);
 INSERT INTO `attachment_list` VALUES ('ff52b0f0-909c-11ec-81f7-df5fefcf7eb2', '8200cf50-78ce-11ec-a8a0-ed6c16451136', '/photo/vincent/反-17f0c287163.jpg', 'c:\\zzjFiles\\vincent\\个人事务管理系统\\code\\pamsystem\\server\\statics\\vincent', 1);
+
+-- ----------------------------
+-- Table structure for chat_room
+-- ----------------------------
+DROP TABLE IF EXISTS `chat_room`;
+CREATE TABLE `chat_room`  (
+  `id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT 'roomId聊天室id',
+  `roomName` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '聊天室名称',
+  `msgSavePath` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '聊天文件存储路径',
+  `roomImg` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '聊天室头像',
+  `latestMsg` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '最新消息',
+  `latestMsgTime` date NULL DEFAULT NULL COMMENT '最新消息时间',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of chat_room
+-- ----------------------------
+INSERT INTO `chat_room` VALUES ('99073430-ba57-11ec-8d80-1f2434505ebb', '测试', NULL, NULL, 'hi admin, here is vincent', '2022-04-12');
 
 -- ----------------------------
 -- Table structure for diary_list
@@ -92,35 +111,49 @@ CREATE TABLE `invest_history`  (
 -- ----------------------------
 -- Records of invest_history
 -- ----------------------------
+INSERT INTO `invest_history` VALUES ('04c4b3c0-ba51-11ec-b0dc-6d446f79d3bd', 'cb8ffb70-953c-11ec-a4ef-8b0c17022404', '04c37b40-ba51-11ec-b0dc-6d446f79d3bd');
 INSERT INTO `invest_history` VALUES ('07934db0-8d5a-11ec-8c56-6383ac76f0bc', 'f58b36f0-8d59-11ec-8c56-6383ac76f0bc', '07921530-8d5a-11ec-8c56-6383ac76f0bc');
 INSERT INTO `invest_history` VALUES ('0c47e700-8d58-11ec-8c56-6383ac76f0bc', 'f0751980-8d57-11ec-8c56-6383ac76f0bc', '0c466060-8d58-11ec-8c56-6383ac76f0bc');
+INSERT INTO `invest_history` VALUES ('0e4b1910-ba52-11ec-b0dc-6d446f79d3bd', '0e4859f0-ba52-11ec-b0dc-6d446f79d3bd', '0e4a55c0-ba52-11ec-b0dc-6d446f79d3bd');
 INSERT INTO `invest_history` VALUES ('154e0ab0-8d57-11ec-8c56-6383ac76f0bc', 'ee698780-8d56-11ec-8c56-6383ac76f0bc', '154c35f0-8d57-11ec-8c56-6383ac76f0bc');
 INSERT INTO `invest_history` VALUES ('17bfedb0-8d5a-11ec-8c56-6383ac76f0bc', 'f58b36f0-8d59-11ec-8c56-6383ac76f0bc', '17bda3c0-8d5a-11ec-8c56-6383ac76f0bc');
+INSERT INTO `invest_history` VALUES ('19c617e0-ba52-11ec-b0dc-6d446f79d3bd', '0e4859f0-ba52-11ec-b0dc-6d446f79d3bd', '19c4b850-ba52-11ec-b0dc-6d446f79d3bd');
 INSERT INTO `invest_history` VALUES ('1faeca70-8d58-11ec-8c56-6383ac76f0bc', 'f0751980-8d57-11ec-8c56-6383ac76f0bc', '1facf5b0-8d58-11ec-8c56-6383ac76f0bc');
+INSERT INTO `invest_history` VALUES ('21588750-ba51-11ec-b0dc-6d446f79d3bd', 'b32885e0-8ecd-11ec-b406-f38c6b715ebf', '215727c0-ba51-11ec-b0dc-6d446f79d3bd');
 INSERT INTO `invest_history` VALUES ('24a06b90-8d3c-11ec-b769-a5950aa661da', 'a7a57880-8a32-11ec-ad33-c98a95271994', '249d8560-8d3c-11ec-b769-a5950aa661da');
 INSERT INTO `invest_history` VALUES ('25cb7f40-8d56-11ec-8c56-6383ac76f0bc', '25c71270-8d56-11ec-8c56-6383ac76f0bc', '25ca94e0-8d56-11ec-8c56-6383ac76f0bc');
 INSERT INTO `invest_history` VALUES ('28998c00-8d59-11ec-8c56-6383ac76f0bc', '28971b00-8d59-11ec-8c56-6383ac76f0bc', '2898c8b0-8d59-11ec-8c56-6383ac76f0bc');
 INSERT INTO `invest_history` VALUES ('2ba242b0-8d5a-11ec-8c56-6383ac76f0bc', 'f58b36f0-8d59-11ec-8c56-6383ac76f0bc', '2b9f0e60-8d5a-11ec-8c56-6383ac76f0bc');
+INSERT INTO `invest_history` VALUES ('3527fb20-ba52-11ec-b0dc-6d446f79d3bd', '98293f00-ba51-11ec-b0dc-6d446f79d3bd', '35262660-ba52-11ec-b0dc-6d446f79d3bd');
+INSERT INTO `invest_history` VALUES ('35e83350-ba51-11ec-b0dc-6d446f79d3bd', 'd6e05fb0-8d58-11ec-8c56-6383ac76f0bc', '35e65e90-ba51-11ec-b0dc-6d446f79d3bd');
 INSERT INTO `invest_history` VALUES ('37c03840-8d5a-11ec-8c56-6383ac76f0bc', 'f58b36f0-8d59-11ec-8c56-6383ac76f0bc', '37be8a90-8d5a-11ec-8c56-6383ac76f0bc');
 INSERT INTO `invest_history` VALUES ('3ac86c00-8d56-11ec-8c56-6383ac76f0bc', '25c71270-8d56-11ec-8c56-6383ac76f0bc', '3ac5fb00-8d56-11ec-8c56-6383ac76f0bc');
 INSERT INTO `invest_history` VALUES ('3bb27680-8d59-11ec-8c56-6383ac76f0bc', '28971b00-8d59-11ec-8c56-6383ac76f0bc', '3bb0c8d0-8d59-11ec-8c56-6383ac76f0bc');
 INSERT INTO `invest_history` VALUES ('430c10c0-8d5a-11ec-8c56-6383ac76f0bc', 'f58b36f0-8d59-11ec-8c56-6383ac76f0bc', '430ad840-8d5a-11ec-8c56-6383ac76f0bc');
 INSERT INTO `invest_history` VALUES ('46366b20-8d59-11ec-8c56-6383ac76f0bc', '28971b00-8d59-11ec-8c56-6383ac76f0bc', '46350b90-8d59-11ec-8c56-6383ac76f0bc');
 INSERT INTO `invest_history` VALUES ('4d922510-8d56-11ec-8c56-6383ac76f0bc', '25c71270-8d56-11ec-8c56-6383ac76f0bc', '4d90ec90-8d56-11ec-8c56-6383ac76f0bc');
+INSERT INTO `invest_history` VALUES ('4ec03760-ba51-11ec-b0dc-6d446f79d3bd', 'd6e05fb0-8d58-11ec-8c56-6383ac76f0bc', '4ebe1480-ba51-11ec-b0dc-6d446f79d3bd');
 INSERT INTO `invest_history` VALUES ('50595e90-8d5a-11ec-8c56-6383ac76f0bc', 'f58b36f0-8d59-11ec-8c56-6383ac76f0bc', '5057ff00-8d5a-11ec-8c56-6383ac76f0bc');
+INSERT INTO `invest_history` VALUES ('50dce060-ba52-11ec-b0dc-6d446f79d3bd', '50d9d320-ba52-11ec-b0dc-6d446f79d3bd', '50dbcef0-ba52-11ec-b0dc-6d446f79d3bd');
 INSERT INTO `invest_history` VALUES ('55a507c0-8d58-11ec-8c56-6383ac76f0bc', 'f0751980-8d57-11ec-8c56-6383ac76f0bc', '55a296c0-8d58-11ec-8c56-6383ac76f0bc');
+INSERT INTO `invest_history` VALUES ('5c96d970-ba51-11ec-b0dc-6d446f79d3bd', 'd6e05fb0-8d58-11ec-8c56-6383ac76f0bc', '5c95a0f0-ba51-11ec-b0dc-6d446f79d3bd');
 INSERT INTO `invest_history` VALUES ('64cac9a0-8d59-11ec-8c56-6383ac76f0bc', '64c80a80-8d59-11ec-8c56-6383ac76f0bc', '64c9df40-8d59-11ec-8c56-6383ac76f0bc');
 INSERT INTO `invest_history` VALUES ('65dce7d0-8d57-11ec-8c56-6383ac76f0bc', '65d96560-8d57-11ec-8c56-6383ac76f0bc', '65dbd660-8d57-11ec-8c56-6383ac76f0bc');
+INSERT INTO `invest_history` VALUES ('66a7a470-ba52-11ec-b0dc-6d446f79d3bd', '98293f00-ba51-11ec-b0dc-6d446f79d3bd', '66a69300-ba52-11ec-b0dc-6d446f79d3bd');
 INSERT INTO `invest_history` VALUES ('6b881820-8d3f-11ec-8681-37c5fb39410b', '6b7d69c0-8d3f-11ec-8681-37c5fb39410b', '6b869180-8d3f-11ec-8681-37c5fb39410b');
 INSERT INTO `invest_history` VALUES ('73053690-8d59-11ec-8c56-6383ac76f0bc', '64c80a80-8d59-11ec-8c56-6383ac76f0bc', '730313b0-8d59-11ec-8c56-6383ac76f0bc');
 INSERT INTO `invest_history` VALUES ('740c73c0-8d61-11ec-b459-41cebc5fb334', 'f58b36f0-8d59-11ec-8c56-6383ac76f0bc', '740547d0-8d61-11ec-b459-41cebc5fb334');
 INSERT INTO `invest_history` VALUES ('76f45d00-8d57-11ec-8c56-6383ac76f0bc', '65d96560-8d57-11ec-8c56-6383ac76f0bc', '76f28840-8d57-11ec-8c56-6383ac76f0bc');
+INSERT INTO `invest_history` VALUES ('7994c400-ba52-11ec-b0dc-6d446f79d3bd', '0e4859f0-ba52-11ec-b0dc-6d446f79d3bd', '7993b290-ba52-11ec-b0dc-6d446f79d3bd');
 INSERT INTO `invest_history` VALUES ('7b999790-8d56-11ec-8c56-6383ac76f0bc', '7b944060-8d56-11ec-8c56-6383ac76f0bc', '7b97e9e0-8d56-11ec-8c56-6383ac76f0bc');
+INSERT INTO `invest_history` VALUES ('7c388940-ba51-11ec-b0dc-6d446f79d3bd', 'ef9d4b90-8d61-11ec-b459-41cebc5fb334', '7c36db90-ba51-11ec-b0dc-6d446f79d3bd');
 INSERT INTO `invest_history` VALUES ('8d0fa780-8d56-11ec-8c56-6383ac76f0bc', '7b944060-8d56-11ec-8c56-6383ac76f0bc', '8d0dabb0-8d56-11ec-8c56-6383ac76f0bc');
 INSERT INTO `invest_history` VALUES ('92c14900-8d55-11ec-8c56-6383ac76f0bc', '92bc18e0-8d55-11ec-8c56-6383ac76f0bc', '92bf9b50-8d55-11ec-8c56-6383ac76f0bc');
 INSERT INTO `invest_history` VALUES ('95f24700-8d3c-11ec-b769-a5950aa661da', 'a7a57880-8a32-11ec-ad33-c98a95271994', '95ee7670-8d3c-11ec-b769-a5950aa661da');
+INSERT INTO `invest_history` VALUES ('982b3ad0-ba51-11ec-b0dc-6d446f79d3bd', '98293f00-ba51-11ec-b0dc-6d446f79d3bd', '982a9e90-ba51-11ec-b0dc-6d446f79d3bd');
 INSERT INTO `invest_history` VALUES ('a0751970-8d58-11ec-8c56-6383ac76f0bc', 'a06ed7e0-8d58-11ec-8c56-6383ac76f0bc', 'a073b9e0-8d58-11ec-8c56-6383ac76f0bc');
 INSERT INTO `invest_history` VALUES ('a5decfd0-8ef4-11ec-bf24-cb62b9f0aa7e', 'a5d8b550-8ef4-11ec-bf24-cb62b9f0aa7e', 'a5dd7040-8ef4-11ec-bf24-cb62b9f0aa7e');
+INSERT INTO `invest_history` VALUES ('a7faedc0-ba51-11ec-b0dc-6d446f79d3bd', 'ef9d4b90-8d61-11ec-b459-41cebc5fb334', 'a7f94010-ba51-11ec-b0dc-6d446f79d3bd');
 INSERT INTO `invest_history` VALUES ('a84a2620-7b4e-11ec-a9d1-7730d6510543', '52249570-7b42-11ec-95ae-535d65a411fa', 'a8473ff0-7b4e-11ec-a9d1-7730d6510543');
 INSERT INTO `invest_history` VALUES ('ab9ecb50-8d55-11ec-8c56-6383ac76f0bc', '92bc18e0-8d55-11ec-8c56-6383ac76f0bc', 'ab9ccf80-8d55-11ec-8c56-6383ac76f0bc');
 INSERT INTO `invest_history` VALUES ('ac7d8b30-8d58-11ec-8c56-6383ac76f0bc', 'a06ed7e0-8d58-11ec-8c56-6383ac76f0bc', 'ac7c2ba0-8d58-11ec-8c56-6383ac76f0bc');
@@ -130,10 +163,14 @@ INSERT INTO `invest_history` VALUES ('b32c7d80-8ecd-11ec-b406-f38c6b715ebf', 'b3
 INSERT INTO `invest_history` VALUES ('b5cdd740-8d57-11ec-8c56-6383ac76f0bc', 'b5c9b890-8d57-11ec-8c56-6383ac76f0bc', 'b5cc77b0-8d57-11ec-8c56-6383ac76f0bc');
 INSERT INTO `invest_history` VALUES ('ba617e40-8d59-11ec-8c56-6383ac76f0bc', 'b0e81bd0-8d59-11ec-8c56-6383ac76f0bc', 'ba5a5250-8d59-11ec-8c56-6383ac76f0bc');
 INSERT INTO `invest_history` VALUES ('bcd74090-8d56-11ec-8c56-6383ac76f0bc', 'ad8aee70-8d56-11ec-8c56-6383ac76f0bc', 'bcd544c0-8d56-11ec-8c56-6383ac76f0bc');
+INSERT INTO `invest_history` VALUES ('bd473300-ba51-11ec-b0dc-6d446f79d3bd', '98293f00-ba51-11ec-b0dc-6d446f79d3bd', 'bd45fa80-ba51-11ec-b0dc-6d446f79d3bd');
 INSERT INTO `invest_history` VALUES ('cb93f310-953c-11ec-a4ef-8b0c17022404', 'cb8ffb70-953c-11ec-a4ef-8b0c17022404', 'cb92ba90-953c-11ec-a4ef-8b0c17022404');
 INSERT INTO `invest_history` VALUES ('cba5bab0-8d57-11ec-8c56-6383ac76f0bc', 'b5c9b890-8d57-11ec-8c56-6383ac76f0bc', 'cba43410-8d57-11ec-8c56-6383ac76f0bc');
 INSERT INTO `invest_history` VALUES ('d6e4f390-8d58-11ec-8c56-6383ac76f0bc', 'd6e05fb0-8d58-11ec-8c56-6383ac76f0bc', 'd6e3bb10-8d58-11ec-8c56-6383ac76f0bc');
+INSERT INTO `invest_history` VALUES ('d8d9c330-ba51-11ec-b0dc-6d446f79d3bd', 'ef9d4b90-8d61-11ec-b459-41cebc5fb334', 'd8d863a0-ba51-11ec-b0dc-6d446f79d3bd');
 INSERT INTO `invest_history` VALUES ('e6c304a0-8ee8-11ec-ad8b-37d77df37e4e', 'e6bdad70-8ee8-11ec-ad8b-37d77df37e4e', 'e6c1a510-8ee8-11ec-ad8b-37d77df37e4e');
+INSERT INTO `invest_history` VALUES ('eb68b2a0-ba50-11ec-b0dc-6d446f79d3bd', 'e6bdad70-8ee8-11ec-ad8b-37d77df37e4e', 'eb6641a0-ba50-11ec-b0dc-6d446f79d3bd');
+INSERT INTO `invest_history` VALUES ('ecedfda0-ba51-11ec-b0dc-6d446f79d3bd', '98293f00-ba51-11ec-b0dc-6d446f79d3bd', 'ecec9e10-ba51-11ec-b0dc-6d446f79d3bd');
 INSERT INTO `invest_history` VALUES ('ed367b30-8d55-11ec-8c56-6383ac76f0bc', 'ed328390-8d55-11ec-8c56-6383ac76f0bc', 'ed3569c0-8d55-11ec-8c56-6383ac76f0bc');
 INSERT INTO `invest_history` VALUES ('ee6ce2e0-8d56-11ec-8c56-6383ac76f0bc', 'ee698780-8d56-11ec-8c56-6383ac76f0bc', 'ee6bd170-8d56-11ec-8c56-6383ac76f0bc');
 INSERT INTO `invest_history` VALUES ('efa4ecb0-8d61-11ec-b459-41cebc5fb334', 'ef9d4b90-8d61-11ec-b459-41cebc5fb334', 'efa2a2c0-8d61-11ec-b459-41cebc5fb334');
@@ -173,30 +210,33 @@ CREATE TABLE `invest_item`  (
 -- ----------------------------
 -- Records of invest_item
 -- ----------------------------
+INSERT INTO `invest_item` VALUES ('0e4859f0-ba52-11ec-b0dc-6d446f79d3bd', '1', '香江控股', '2022-03-31', 2.580, 21300, 2.573, 52824.0000, 54804.0000, NULL, NULL, -1980.9000, 1, 'sh600162', 2.480, '2022-04-12', 0, '8200cf50-78ce-11ec-a8a0-ed6c3ba62da6');
 INSERT INTO `invest_item` VALUES ('25b7eb80-8d3b-11ec-b769-a5950aa661da', '1', '国电电力', '2022-02-01', 2.000, 10000, 2.000, 20000.0000, 20000.0000, NULL, NULL, NULL, 1, 'sh600795', NULL, NULL, 1, 'c362d810-79b1-11ec-877a-b30fb9b4ce28');
 INSERT INTO `invest_item` VALUES ('25c71270-8d56-11ec-8c56-6383ac76f0bc', '1', '南国置业', '2021-09-07', 1.960, 0, 0.000, 19600.0000, 0.0000, '2021-12-17', 2.090, 1075.0000, 0, 'sz002305', NULL, NULL, 0, '8200cf50-78ce-11ec-a8a0-ed6c3ba62da6');
 INSERT INTO `invest_item` VALUES ('28971b00-8d59-11ec-8c56-6383ac76f0bc', '1', '华远地产', '2021-12-22', 2.190, 0, 0.000, 12702.0000, 0.0000, '2022-01-20', 2.330, 1650.0000, 0, 'sh600743', NULL, NULL, 0, '8200cf50-78ce-11ec-a8a0-ed6c3ba62da6');
+INSERT INTO `invest_item` VALUES ('50d9d320-ba52-11ec-b0dc-6d446f79d3bd', '1', '美好置业', '2022-04-06', 2.150, 4100, 2.150, 7831.0000, 8815.0000, NULL, NULL, -984.0000, 1, 'sz000667', 1.910, '2022-04-12', 0, '8200cf50-78ce-11ec-a8a0-ed6c3ba62da6');
 INSERT INTO `invest_item` VALUES ('52249570-7b42-11ec-95ae-535d65a411fa', '1', '国电电力', '2022-01-01', 2.000, 0, 0.000, 28500.0000, 0.0000, '2022-01-07', 2.850, 8500.0000, 0, 'sh600795', 2.850, '2022-01-22', 0, 'c362d810-79b1-11ec-877a-b30fb9b4ce28');
 INSERT INTO `invest_item` VALUES ('64c80a80-8d59-11ec-8c56-6383ac76f0bc', '1', '唐山港', '2021-12-22', 2.850, 0, 0.000, 28500.0000, 0.0000, '2022-02-09', 3.000, 1500.0000, 0, 'sh601000', NULL, NULL, 0, '8200cf50-78ce-11ec-a8a0-ed6c3ba62da6');
 INSERT INTO `invest_item` VALUES ('65d96560-8d57-11ec-8c56-6383ac76f0bc', '1', '香江控股', '2021-09-23', 2.040, 0, 0.000, 10404.0000, 0.0000, '2021-12-22', 2.490, 2295.0000, 0, 'sh600162', NULL, NULL, 0, '8200cf50-78ce-11ec-a8a0-ed6c3ba62da6');
 INSERT INTO `invest_item` VALUES ('6b7d69c0-8d3f-11ec-8681-37c5fb39410b', '1', '国电电力', '2022-02-04', 2.000, 10000, 2.000, 27900.0000, 20000.0000, NULL, NULL, 7900.0000, 1, 'sh600795', 2.790, '2022-02-14', 0, 'c362d810-79b1-11ec-877a-b30fb9b4ce28');
 INSERT INTO `invest_item` VALUES ('7b944060-8d56-11ec-8c56-6383ac76f0bc', '1', '上海建工', '2021-09-08', 2.950, 0, 0.000, 21240.0000, 0.0000, '2021-09-10', 3.080, 936.0000, 0, 'sh600170', NULL, NULL, 0, '8200cf50-78ce-11ec-a8a0-ed6c3ba62da6');
 INSERT INTO `invest_item` VALUES ('92bc18e0-8d55-11ec-8c56-6383ac76f0bc', '1', '香江控股', '2021-09-01', 1.860, 0, 0.000, 18600.0000, 0.0000, '2021-09-06', 1.920, 600.0000, 0, 'sh600162', NULL, NULL, 0, '8200cf50-78ce-11ec-a8a0-ed6c3ba62da6');
+INSERT INTO `invest_item` VALUES ('98293f00-ba51-11ec-b0dc-6d446f79d3bd', '1', '华远地产', '2022-03-29', 3.290, 5700, 1.958, 13566.0000, 11162.0000, NULL, NULL, 2405.4000, 1, 'sh600743', 2.380, '2022-04-12', 0, '8200cf50-78ce-11ec-a8a0-ed6c3ba62da6');
 INSERT INTO `invest_item` VALUES ('a06ed7e0-8d58-11ec-8c56-6383ac76f0bc', '1', '中国中治', '2021-12-20', 4.090, 0, 0.000, 8180.0000, 0.0000, '2022-01-07', 4.150, 120.0000, 0, 'sh601618', NULL, NULL, 0, '8200cf50-78ce-11ec-a8a0-ed6c3ba62da6');
-INSERT INTO `invest_item` VALUES ('a5d8b550-8ef4-11ec-bf24-cb62b9f0aa7e', '1', '中国能建', '2022-02-16', 2.780, 5000, 2.780, 13450.0000, 13900.0000, NULL, NULL, -450.0000, 1, 'sh601868', 2.690, '2022-02-24', 0, '8200cf50-78ce-11ec-a8a0-ed6c3ba62da6');
+INSERT INTO `invest_item` VALUES ('a5d8b550-8ef4-11ec-bf24-cb62b9f0aa7e', '1', '中国能建', '2022-02-16', 2.780, 5000, 2.780, 12450.0000, 13900.0000, NULL, NULL, -1450.0000, 1, 'sh601868', 2.490, '2022-04-12', 0, '8200cf50-78ce-11ec-a8a0-ed6c3ba62da6');
 INSERT INTO `invest_item` VALUES ('a7a57880-8a32-11ec-ad33-c98a95271994', '1', '国电电力', '2022-02-04', 2.000, 0, 0.000, 14100.0000, 0.0000, '2022-02-08', 4.000, 15000.0000, 0, 'sh600795', 2.820, '2022-02-14', 0, 'c362d810-79b1-11ec-877a-b30fb9b4ce28');
 INSERT INTO `invest_item` VALUES ('ad8aee70-8d56-11ec-8c56-6383ac76f0bc', '1', '美好置业', '2021-09-13', 1.800, 0, 0.000, 18000.0000, 0.0000, '2021-09-16', 1.900, 1000.0000, 0, 'sz000667', NULL, NULL, 0, '8200cf50-78ce-11ec-a8a0-ed6c3ba62da6');
 INSERT INTO `invest_item` VALUES ('b0e81bd0-8d59-11ec-8c56-6383ac76f0bc', '1', '省广集团', '2020-10-21', 6.672, 0, 0.000, 9340.8000, 0.0000, '2022-02-11', 5.870, -1122.8000, 0, 'sz002400', NULL, NULL, 0, '8200cf50-78ce-11ec-a8a0-ed6c3ba62da6');
-INSERT INTO `invest_item` VALUES ('b32885e0-8ecd-11ec-b406-f38c6b715ebf', '1', '美好置业', '2022-02-16', 1.710, 10000, 1.710, 16700.0000, 17100.0000, NULL, NULL, -400.0000, 1, 'sz000667', 1.670, '2022-02-24', 0, '8200cf50-78ce-11ec-a8a0-ed6c3ba62da6');
+INSERT INTO `invest_item` VALUES ('b32885e0-8ecd-11ec-b406-f38c6b715ebf', '1', '美好置业', '2022-02-16', 1.710, 0, 0.000, 19100.0000, 0.0000, '2022-03-21', 1.800, 900.0000, 0, 'sz000667', 1.910, '2022-04-12', 0, '8200cf50-78ce-11ec-a8a0-ed6c3ba62da6');
 INSERT INTO `invest_item` VALUES ('b5c9b890-8d57-11ec-8c56-6383ac76f0bc', '1', '唐山港', '2021-12-03', 2.760, 0, 0.000, 5244.0000, 0.0000, '2021-12-20', 2.780, 38.0000, 0, 'sh601000', NULL, NULL, 0, '8200cf50-78ce-11ec-a8a0-ed6c3ba62da6');
-INSERT INTO `invest_item` VALUES ('cb8ffb70-953c-11ec-a4ef-8b0c17022404', '1', '上海建工', '2022-02-22', 3.620, 4000, 3.620, 13240.0000, 14480.0000, NULL, NULL, -1240.0000, 1, 'sh600170', 3.310, '2022-02-24', 0, '8200cf50-78ce-11ec-a8a0-ed6c3ba62da6');
-INSERT INTO `invest_item` VALUES ('d6e05fb0-8d58-11ec-8c56-6383ac76f0bc', '1', '南国置业', '2022-01-20', 2.270, 12500, 2.250, 26000.0000, 28125.0000, NULL, NULL, -2125.0000, 1, 'sz002305', 2.080, '2022-02-24', 0, '8200cf50-78ce-11ec-a8a0-ed6c3ba62da6');
-INSERT INTO `invest_item` VALUES ('e6bdad70-8ee8-11ec-ad8b-37d77df37e4e', '1', '唐山港', '2022-02-16', 2.890, 5000, 2.890, 13950.0000, 14450.0000, NULL, NULL, -500.0000, 1, 'sh601000', 2.790, '2022-02-24', 0, '8200cf50-78ce-11ec-a8a0-ed6c3ba62da6');
+INSERT INTO `invest_item` VALUES ('cb8ffb70-953c-11ec-a4ef-8b0c17022404', '1', '上海建工', '2022-02-22', 3.620, 8500, 3.445, 29070.0000, 29285.0000, NULL, NULL, -212.5000, 1, 'sh600170', 3.420, '2022-04-12', 0, '8200cf50-78ce-11ec-a8a0-ed6c3ba62da6');
+INSERT INTO `invest_item` VALUES ('d6e05fb0-8d58-11ec-8c56-6383ac76f0bc', '1', '南国置业', '2022-01-20', 2.270, 0, 0.000, 45000.0000, 0.0000, '2022-03-25', 2.560, 3695.1000, 0, 'sz002305', 3.600, '2022-04-12', 0, '8200cf50-78ce-11ec-a8a0-ed6c3ba62da6');
+INSERT INTO `invest_item` VALUES ('e6bdad70-8ee8-11ec-ad8b-37d77df37e4e', '1', '唐山港', '2022-02-16', 2.890, 0, 0.000, 15100.0000, 0.0000, '2022-03-01', 2.920, 150.0000, 0, 'sh601000', 3.020, '2022-04-12', 0, '8200cf50-78ce-11ec-a8a0-ed6c3ba62da6');
 INSERT INTO `invest_item` VALUES ('ed328390-8d55-11ec-8c56-6383ac76f0bc', '1', '美好置业', '2021-09-07', 1.730, 0, 0.000, 17300.0000, 0.0000, '2021-09-08', 1.840, 1100.0000, 0, 'sz000667', NULL, NULL, 0, '8200cf50-78ce-11ec-a8a0-ed6c3ba62da6');
-INSERT INTO `invest_item` VALUES ('ee698780-8d56-11ec-8c56-6383ac76f0bc', '1', '西南证券', '2021-09-16', 5.410, 7500, 5.214, 35400.0000, 39102.0000, NULL, NULL, -3705.0000, 1, 'sh600369', 4.720, '2022-02-24', 0, '8200cf50-78ce-11ec-a8a0-ed6c3ba62da6');
-INSERT INTO `invest_item` VALUES ('ef9d4b90-8d61-11ec-b459-41cebc5fb334', '1', '香江控股', '2022-02-14', 2.220, 5000, 2.220, 10900.0000, 11100.0000, NULL, NULL, -200.0000, 1, 'sh600162', 2.180, '2022-02-24', 0, '8200cf50-78ce-11ec-a8a0-ed6c3ba62da6');
+INSERT INTO `invest_item` VALUES ('ee698780-8d56-11ec-8c56-6383ac76f0bc', '1', '西南证券', '2021-09-16', 5.410, 7500, 5.214, 33075.0000, 39102.0000, NULL, NULL, -6030.0000, 1, 'sh600369', 4.410, '2022-04-12', 0, '8200cf50-78ce-11ec-a8a0-ed6c3ba62da6');
+INSERT INTO `invest_item` VALUES ('ef9d4b90-8d61-11ec-b459-41cebc5fb334', '1', '香江控股', '2022-02-14', 2.220, 0, 0.000, 12400.0000, 0.0000, '2022-03-30', 2.650, 5145.0000, 0, 'sh600162', 2.480, '2022-04-12', 0, '8200cf50-78ce-11ec-a8a0-ed6c3ba62da6');
 INSERT INTO `invest_item` VALUES ('f0751980-8d57-11ec-8c56-6383ac76f0bc', '1', '中国能建', '2021-12-17', 2.720, 0, 0.000, 5168.0000, 0.0000, '2022-02-10', 2.980, 1267.2000, 0, 'sh601868', NULL, NULL, 0, '8200cf50-78ce-11ec-a8a0-ed6c3ba62da6');
-INSERT INTO `invest_item` VALUES ('f58b36f0-8d59-11ec-8c56-6383ac76f0bc', '1', '国电电力', '2021-12-03', 2.670, 10000, 2.704, 26200.0000, 27038.0000, NULL, NULL, -840.0000, 1, 'sh600795', 2.620, '2022-02-24', 0, '8200cf50-78ce-11ec-a8a0-ed6c3ba62da6');
+INSERT INTO `invest_item` VALUES ('f58b36f0-8d59-11ec-8c56-6383ac76f0bc', '1', '国电电力', '2021-12-03', 2.670, 10000, 2.704, 25800.0000, 27038.0000, NULL, NULL, -1240.0000, 1, 'sh600795', 2.580, '2022-04-12', 0, '8200cf50-78ce-11ec-a8a0-ed6c3ba62da6');
 
 -- ----------------------------
 -- Table structure for invest_moneyflowing
@@ -224,6 +264,7 @@ INSERT INTO `invest_moneyflowing` VALUES ('5105f440-8d44-11ec-8dc4-f59ca79851b8'
 INSERT INTO `invest_moneyflowing` VALUES ('54430160-8d45-11ec-8c56-6383ac76f0bc', '8200cf50-78ce-11ec-a8a0-ed6c3ba62da6', 1, 0, 15000.000, 9481.240, '2021-07-10');
 INSERT INTO `invest_moneyflowing` VALUES ('62414980-8d62-11ec-b459-41cebc5fb334', '8200cf50-78ce-11ec-a8a0-ed6c3ba62da6', 2, 0, 22000.000, 0.000, '2022-02-14');
 INSERT INTO `invest_moneyflowing` VALUES ('62738340-8d45-11ec-8c56-6383ac76f0bc', '8200cf50-78ce-11ec-a8a0-ed6c3ba62da6', 1, 1, 28000.000, 37481.240, '2021-08-04');
+INSERT INTO `invest_moneyflowing` VALUES ('6eb2e2d0-ba50-11ec-b0dc-6d446f79d3bd', '8200cf50-78ce-11ec-a8a0-ed6c3ba62da6', 1, 1, 9000.000, 163466.540, '2022-04-06');
 INSERT INTO `invest_moneyflowing` VALUES ('70055420-8d45-11ec-8c56-6383ac76f0bc', '8200cf50-78ce-11ec-a8a0-ed6c3ba62da6', 1, 0, 10014.700, 27466.540, '2021-09-10');
 INSERT INTO `invest_moneyflowing` VALUES ('7dfb3e00-8d45-11ec-8c56-6383ac76f0bc', '8200cf50-78ce-11ec-a8a0-ed6c3ba62da6', 1, 1, 85000.000, 112466.540, '2021-11-18');
 INSERT INTO `invest_moneyflowing` VALUES ('8698e670-8d45-11ec-8c56-6383ac76f0bc', '8200cf50-78ce-11ec-a8a0-ed6c3ba62da6', 1, 1, 2000.000, 114466.540, '2022-01-18');
@@ -250,35 +291,49 @@ CREATE TABLE `invest_record`  (
 -- ----------------------------
 -- Records of invest_record
 -- ----------------------------
+INSERT INTO `invest_record` VALUES ('04c37b40-ba51-11ec-b0dc-6d446f79d3bd', '2022-04-01', '1', 3.290, 4500, 3.445);
 INSERT INTO `invest_record` VALUES ('07921530-8d5a-11ec-8c56-6383ac76f0bc', '2021-12-15', '1', 2.870, 1800, 2.770);
 INSERT INTO `invest_record` VALUES ('0c466060-8d58-11ec-8c56-6383ac76f0bc', '2021-12-22', '1', 2.820, 900, 2.828);
+INSERT INTO `invest_record` VALUES ('0e4a55c0-ba52-11ec-b0dc-6d446f79d3bd', '2022-03-31', '0', 2.580, 10000, 2.580);
 INSERT INTO `invest_record` VALUES ('154c35f0-8d57-11ec-8c56-6383ac76f0bc', '2022-02-11', '1', 4.920, 2500, 5.214);
 INSERT INTO `invest_record` VALUES ('17bda3c0-8d5a-11ec-8c56-6383ac76f0bc', '2021-12-17', '2', 3.050, 1800, 2.490);
+INSERT INTO `invest_record` VALUES ('19c4b850-ba52-11ec-b0dc-6d446f79d3bd', '2022-03-31', '1', 2.550, 5000, 2.570);
 INSERT INTO `invest_record` VALUES ('1facf5b0-8d58-11ec-8c56-6383ac76f0bc', '2021-12-31', '1', 2.760, 2500, 2.804);
+INSERT INTO `invest_record` VALUES ('215727c0-ba51-11ec-b0dc-6d446f79d3bd', '2022-03-21', '2', 1.800, 10000, 0.000);
 INSERT INTO `invest_record` VALUES ('249d8560-8d3c-11ec-b769-a5950aa661da', '2022-02-05', '2', 3.000, 5000, 1.000);
 INSERT INTO `invest_record` VALUES ('25ca94e0-8d56-11ec-8c56-6383ac76f0bc', '2021-09-07', '0', 1.960, 10000, 1.960);
 INSERT INTO `invest_record` VALUES ('2898c8b0-8d59-11ec-8c56-6383ac76f0bc', '2021-12-22', '0', 2.190, 5800, 2.190);
 INSERT INTO `invest_record` VALUES ('2b9f0e60-8d5a-11ec-8c56-6383ac76f0bc', '2021-12-20', '1', 2.910, 2800, 2.746);
+INSERT INTO `invest_record` VALUES ('35262660-ba52-11ec-b0dc-6d446f79d3bd', '2022-03-31', '1', 2.610, 5600, 2.425);
+INSERT INTO `invest_record` VALUES ('35e65e90-ba51-11ec-b0dc-6d446f79d3bd', '2022-03-22', '2', 2.490, 6200, 2.014);
 INSERT INTO `invest_record` VALUES ('37be8a90-8d5a-11ec-8c56-6383ac76f0bc', '2021-12-31', '2', 3.190, 2200, 2.338);
 INSERT INTO `invest_record` VALUES ('3ac5fb00-8d56-11ec-8c56-6383ac76f0bc', '2021-12-15', '2', 2.060, 7500, 1.660);
 INSERT INTO `invest_record` VALUES ('3bb0c8d0-8d59-11ec-8c56-6383ac76f0bc', '2021-12-22', '1', 2.130, 4200, 2.165);
 INSERT INTO `invest_record` VALUES ('430ad840-8d5a-11ec-8c56-6383ac76f0bc', '2022-01-04', '1', 3.060, 600, 2.483);
 INSERT INTO `invest_record` VALUES ('46350b90-8d59-11ec-8c56-6383ac76f0bc', '2022-01-20', '2', 2.330, 10000, 0.000);
 INSERT INTO `invest_record` VALUES ('4d90ec90-8d56-11ec-8c56-6383ac76f0bc', '2021-12-17', '2', 2.090, 2500, 0.000);
+INSERT INTO `invest_record` VALUES ('4ebe1480-ba51-11ec-b0dc-6d446f79d3bd', '2022-03-23', '1', 2.510, 5000, 2.233);
 INSERT INTO `invest_record` VALUES ('5057ff00-8d5a-11ec-8c56-6383ac76f0bc', '2022-01-10', '1', 2.850, 3000, 2.666);
+INSERT INTO `invest_record` VALUES ('50dbcef0-ba52-11ec-b0dc-6d446f79d3bd', '2022-04-06', '0', 2.150, 4100, 2.150);
 INSERT INTO `invest_record` VALUES ('55a296c0-8d58-11ec-8c56-6383ac76f0bc', '2022-02-10', '2', 2.980, 7200, 0.000);
+INSERT INTO `invest_record` VALUES ('5c95a0f0-ba51-11ec-b0dc-6d446f79d3bd', '2022-03-25', '2', 2.560, 11300, 0.000);
 INSERT INTO `invest_record` VALUES ('64c9df40-8d59-11ec-8c56-6383ac76f0bc', '2021-12-22', '0', 2.850, 10000, 2.850);
 INSERT INTO `invest_record` VALUES ('65dbd660-8d57-11ec-8c56-6383ac76f0bc', '2021-09-23', '0', 2.040, 5100, 2.040);
+INSERT INTO `invest_record` VALUES ('66a69300-ba52-11ec-b0dc-6d446f79d3bd', '2022-04-08', '2', 2.900, 5600, 1.958);
 INSERT INTO `invest_record` VALUES ('6b869180-8d3f-11ec-8681-37c5fb39410b', '2022-02-04', '0', 2.000, 10000, 2.000);
 INSERT INTO `invest_record` VALUES ('730313b0-8d59-11ec-8c56-6383ac76f0bc', '2022-02-09', '2', 3.000, 10000, 0.000);
 INSERT INTO `invest_record` VALUES ('740547d0-8d61-11ec-b459-41cebc5fb334', '2022-02-14', '1', 2.760, 4000, 2.704);
 INSERT INTO `invest_record` VALUES ('76f28840-8d57-11ec-8c56-6383ac76f0bc', '2021-12-22', '2', 2.490, 5100, 0.000);
+INSERT INTO `invest_record` VALUES ('7993b290-ba52-11ec-b0dc-6d446f79d3bd', '2022-04-08', '1', 2.580, 6300, 2.573);
 INSERT INTO `invest_record` VALUES ('7b97e9e0-8d56-11ec-8c56-6383ac76f0bc', '2021-09-08', '0', 2.950, 7200, 2.950);
+INSERT INTO `invest_record` VALUES ('7c36db90-ba51-11ec-b0dc-6d446f79d3bd', '2022-03-28', '1', 2.330, 5000, 2.275);
 INSERT INTO `invest_record` VALUES ('8d0dabb0-8d56-11ec-8c56-6383ac76f0bc', '2021-09-10', '2', 3.080, 7200, 0.000);
 INSERT INTO `invest_record` VALUES ('92bf9b50-8d55-11ec-8c56-6383ac76f0bc', '2021-09-01', '0', 1.860, 10000, 1.860);
 INSERT INTO `invest_record` VALUES ('95ee7670-8d3c-11ec-b769-a5950aa661da', '2022-02-08', '2', 4.000, 5000, 0.000);
+INSERT INTO `invest_record` VALUES ('982a9e90-ba51-11ec-b0dc-6d446f79d3bd', '2022-03-29', '0', 3.290, 5000, 3.290);
 INSERT INTO `invest_record` VALUES ('a073b9e0-8d58-11ec-8c56-6383ac76f0bc', '2021-12-20', '0', 4.090, 2000, 4.090);
 INSERT INTO `invest_record` VALUES ('a5dd7040-8ef4-11ec-bf24-cb62b9f0aa7e', '2022-02-16', '0', 2.780, 5000, 2.780);
+INSERT INTO `invest_record` VALUES ('a7f94010-ba51-11ec-b0dc-6d446f79d3bd', '2022-03-29', '1', 2.370, 5000, 2.307);
 INSERT INTO `invest_record` VALUES ('a8473ff0-7b4e-11ec-a9d1-7730d6510543', '2022-01-07', '2', 2.850, 10000, 0.000);
 INSERT INTO `invest_record` VALUES ('ab9ccf80-8d55-11ec-8c56-6383ac76f0bc', '2021-09-06', '2', 1.920, 10000, 0.000);
 INSERT INTO `invest_record` VALUES ('ac7c2ba0-8d58-11ec-8c56-6383ac76f0bc', '2022-01-07', '2', 4.150, 2000, 0.000);
@@ -288,10 +343,14 @@ INSERT INTO `invest_record` VALUES ('b32b1df0-8ecd-11ec-b406-f38c6b715ebf', '202
 INSERT INTO `invest_record` VALUES ('b5cc77b0-8d57-11ec-8c56-6383ac76f0bc', '2021-12-03', '0', 2.760, 1900, 2.760);
 INSERT INTO `invest_record` VALUES ('ba5a5250-8d59-11ec-8c56-6383ac76f0bc', '2022-02-11', '2', 5.870, 1400, 0.000);
 INSERT INTO `invest_record` VALUES ('bcd544c0-8d56-11ec-8c56-6383ac76f0bc', '2021-09-16', '2', 1.900, 10000, 0.000);
+INSERT INTO `invest_record` VALUES ('bd45fa80-ba51-11ec-b0dc-6d446f79d3bd', '2022-03-30', '1', 2.480, 5700, 2.438);
 INSERT INTO `invest_record` VALUES ('cb92ba90-953c-11ec-a4ef-8b0c17022404', '2022-02-22', '0', 3.620, 4000, 3.620);
 INSERT INTO `invest_record` VALUES ('cba43410-8d57-11ec-8c56-6383ac76f0bc', '2021-12-20', '2', 2.780, 1900, 0.000);
 INSERT INTO `invest_record` VALUES ('d6e3bb10-8d58-11ec-8c56-6383ac76f0bc', '2022-01-20', '0', 2.270, 10000, 2.270);
+INSERT INTO `invest_record` VALUES ('d8d863a0-ba51-11ec-b0dc-6d446f79d3bd', '2022-03-30', '2', 2.650, 15000, 0.000);
 INSERT INTO `invest_record` VALUES ('e6c1a510-8ee8-11ec-ad8b-37d77df37e4e', '2022-02-16', '0', 2.890, 5000, 2.890);
+INSERT INTO `invest_record` VALUES ('eb6641a0-ba50-11ec-b0dc-6d446f79d3bd', '2022-03-01', '2', 2.920, 5000, 0.000);
+INSERT INTO `invest_record` VALUES ('ecec9e10-ba51-11ec-b0dc-6d446f79d3bd', '2022-03-30', '2', 2.660, 5000, 2.243);
 INSERT INTO `invest_record` VALUES ('ed3569c0-8d55-11ec-8c56-6383ac76f0bc', '2021-09-07', '0', 1.730, 10000, 1.730);
 INSERT INTO `invest_record` VALUES ('ee6bd170-8d56-11ec-8c56-6383ac76f0bc', '2021-09-16', '0', 5.410, 4200, 5.410);
 INSERT INTO `invest_record` VALUES ('efa2a2c0-8d61-11ec-b459-41cebc5fb334', '2022-02-14', '0', 2.220, 5000, 2.220);
@@ -318,7 +377,7 @@ CREATE TABLE `invest_usercount`  (
 -- Records of invest_usercount
 -- ----------------------------
 INSERT INTO `invest_usercount` VALUES ('a0a85810-811b-11ec-b329-59888a27188f', 'c362d810-79b1-11ec-877a-b30fb9b4ce28', 95000.000, 12000);
-INSERT INTO `invest_usercount` VALUES ('f0dd2c60-8a31-11ec-9237-1f1428622ccb', '8200cf50-78ce-11ec-a8a0-ed6c3ba62da6', 154466.540, 0);
+INSERT INTO `invest_usercount` VALUES ('f0dd2c60-8a31-11ec-9237-1f1428622ccb', '8200cf50-78ce-11ec-a8a0-ed6c3ba62da6', 163466.540, 0);
 
 -- ----------------------------
 -- Table structure for sys_user
@@ -337,5 +396,23 @@ CREATE TABLE `sys_user`  (
 -- ----------------------------
 INSERT INTO `sys_user` VALUES ('8200cf50-78ce-11ec-a8a0-ed6c3ba62da6', 'vincent', 'MzMxMjkzZjIwZTY4OWQxMmZlMjA3YmNlY2Q0Yzk5ZGI=', '13631474749');
 INSERT INTO `sys_user` VALUES ('c362d810-79b1-11ec-877a-b30fb9b4ce28', 'admin', 'MjEyMzJmMjk3YTU3YTVhNzQzODk0YTBlNGE4MDFmYzM=', 'admin');
+
+-- ----------------------------
+-- Table structure for user_and_room
+-- ----------------------------
+DROP TABLE IF EXISTS `user_and_room`;
+CREATE TABLE `user_and_room`  (
+  `id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '关联id',
+  `userId` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '用户id',
+  `roomId` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '聊天室id',
+  `status` int(10) NOT NULL DEFAULT 1 COMMENT '状态：1-有效数据  2-无效数据',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of user_and_room
+-- ----------------------------
+INSERT INTO `user_and_room` VALUES ('99075b40-ba57-11ec-8d80-1f2434505ebb', '8200cf50-78ce-11ec-a8a0-ed6c3ba62da6', '99073430-ba57-11ec-8d80-1f2434505ebb', 1);
+INSERT INTO `user_and_room` VALUES ('990a1a60-ba57-11ec-8d80-1f2434505ebb', 'c362d810-79b1-11ec-877a-b30fb9b4ce28', '99073430-ba57-11ec-8d80-1f2434505ebb', 1);
 
 SET FOREIGN_KEY_CHECKS = 1;

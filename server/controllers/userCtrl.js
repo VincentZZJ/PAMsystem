@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2021-12-07 14:10:37
- * @LastEditTime: 2022-03-28 16:49:52
+ * @LastEditTime: 2022-04-07 17:28:48
  * @LastEditors: Vincent
  * @Description:
  */
@@ -12,6 +12,8 @@ const {
   updateUserInfoModel,
 } = require('../models/userModel');
 const { setResponseBody } = require('../utils/utils');
+const fsPromise = require('fs').promises;
+const path = require('path');
 const Redis = require('koa-redis');
 
 // 新建redis客户端
@@ -27,9 +29,10 @@ const userLoginCtrl = async (ctx) => {
   try {
     const result = await getUserByUserphoneModel(phone);
     if (result && result.password === password) {
-      // await Store.set(result.username, result.id);
-      // await Store.expire(result.username, 60);
+      await Store.set(result.id, JSON.stringify(result));
+      // await Store.expire(result.id, 60);  // 暂时不定时
       ctx.body = setResponseBody({ phone, username: result.username, userId: result.id });
+      ctx.cookies.set('userId', result.id);
     } else {
       ctx.body = setResponseBody({}, '-1', '账号密码错误');
     }
@@ -67,6 +70,8 @@ const addUserCtrl = async (ctx) => {
   try {
     const result = await addUserInfoModel({ username, password, phone });
     if (result.phone === phone) {
+      const newPath = path.join(__dirname, `../statics/databackup/pamid_${result.phone}`);
+      await fsPromise.mkdir(newPath);
       ctx.body = setResponseBody(result);
     } else {
       ctx.body = setResponseBody({}, '-1', result.desc);

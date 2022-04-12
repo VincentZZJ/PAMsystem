@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2021-12-31 17:13:48
- * @LastEditTime: 2022-04-01 10:34:21
+ * @LastEditTime: 2022-04-11 10:18:22
  * @LastEditors: Vincent
  * @Description:
  */
@@ -9,6 +9,7 @@ import React, { useEffect, useState } from 'react';
 import { Menu } from 'antd';
 import { UserOutlined, LogoutOutlined } from '@ant-design/icons';
 import { useModel, history } from 'umi';
+import { initWebsocket } from '@/utils/websocket';
 import IconFont from '@/components/IconFont';
 import styles from './BasicLayout.less';
 
@@ -64,16 +65,6 @@ const BasicLayout = (props) => {
     history.push(key);
   };
 
-  // 建立websocket连接
-  const initWebsocket = () => {
-    debugger;
-    if (!window.wsServer) {
-      window.wsServer = new WebSocket(
-        `ws://${window.location.hostname}:3030/chatroom?userId=${initialState.currentUser.userId}`,
-      );
-    }
-  };
-
   useEffect(() => {
     // 给window添加事件
     window.onbeforeunload = () => {
@@ -86,7 +77,7 @@ const BasicLayout = (props) => {
     const routesConfig = route?.children?.filter((item) => item.isRoutes === true) || [];
     setMenuConfig(routesConfig);
     setInitialState((s) => ({ ...s, routeConfig: route }));
-    initWebsocket();
+    initWebsocket(window.location.hostname, initialState.currentUser.userId);
   }, []);
 
   return (
