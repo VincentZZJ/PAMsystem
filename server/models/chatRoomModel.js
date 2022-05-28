@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2022-03-28 17:18:03
- * @LastEditTime: 2022-04-07 15:50:11
+ * @LastEditTime: 2022-05-27 15:48:46
  * @LastEditors: Vincent
  * @Description:
  */
@@ -21,7 +21,11 @@ const getRoomListModel = async (userId) => {
     const results = await PamDatabase.query(
       `select * from chat_room where id in (select roomId from user_and_room where userId = '${userId}')`,
     );
-    return results.length > 0 ? results[0] : [];
+    let roomList = [];
+    if (results.length > 0) {
+      roomList = results[0];
+    }
+    return roomList.length > 0 ? roomList : [];
   }
 };
 
@@ -32,13 +36,10 @@ const getRoomListModel = async (userId) => {
  */
 const getUserListByRoomIdModel = async (roomId) => {
   if (roomId) {
-    const userIds = await UserAndRoom.findAll({
-      attributes: ['userId'],
-      where: {
-        roomId,
-      },
-    });
-    return userIds;
+    const userIds = await PamDatabase.query(
+      `select userId from user_and_room where roomId = '${roomId}'`,
+    );
+    return userIds.length > 0 ? userIds[0] : [];
   }
 };
 
@@ -58,7 +59,7 @@ const searchFriendsModel = async ({ phone }) => {
   }
 };
 
-const addFriendModel = async ({ friendId, userId, addMsg, msgTime, roomId }) => {
+const addFriendModel = async ({ friendId, userId, addMsg, msgTime, roomId, roomName }) => {
   await UserAndRoom.create({
     id: UUID.v1(),
     userId,
@@ -71,7 +72,7 @@ const addFriendModel = async ({ friendId, userId, addMsg, msgTime, roomId }) => 
   });
   await ChatRoom.create({
     id: roomId,
-    roomName: '测试',
+    roomName,
     latestMsg: addMsg,
     latestMsgTime: msgTime,
   });

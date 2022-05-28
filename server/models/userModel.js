@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2021-12-07 14:06:31
- * @LastEditTime: 2022-01-12 17:02:35
+ * @LastEditTime: 2022-05-23 16:27:04
  * @LastEditors: Vincent
  * @Description:
  */
@@ -14,6 +14,21 @@ const getUserByUserphoneModel = async (phone) => {
   const userInfo = await User.findOne({
     where: {
       phone: phone,
+    },
+  });
+  if (userInfo) {
+    return userInfo.dataValues;
+  }
+  return {
+    desc: '没有找到该用户',
+  };
+};
+
+// 根据用户id获取用户信息
+const getUserInfoByUserId = async (id) => {
+  const userInfo = await User.findOne({
+    where: {
+      id: id,
     },
   });
   if (userInfo) {
@@ -74,4 +89,5 @@ module.exports = {
   addUserInfoModel,
   delUserByIdModel,
   updateUserInfoModel,
+  getUserInfoByUserId,
 };

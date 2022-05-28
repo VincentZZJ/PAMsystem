@@ -1,13 +1,15 @@
 /*
  * @Author: Vincent
  * @Date: 2022-03-29 18:11:34
- * @LastEditTime: 2022-04-09 15:41:04
+ * @LastEditTime: 2022-05-28 17:06:33
  * @LastEditors: Vincent
  * @Description: websocket管理
  */
 const ws = require('nodejs-websocket');
 const { Mysql } = require('./config/mysql');
 const UserAndRoom = Mysql.user_and_room;
+const { getMsgPath, saveMsgToLocal } = require('./controllers/chatRoomCtrl');
+const { getUserInfoByUserId } = require('./models/userModel');
 
 const WebSocket = function () {
   this.wsServer = null;
@@ -50,7 +52,7 @@ WebSocket.prototype = {
           const msgInfo = JSON.parse(msg);
           // 聊天即时讯息接受
           if (msgInfo.msgPath === 'chatroommsg') {
-            const { roomId } = msgInfo.msgData;
+            const { roomId, msgto, msgfrom, msg, msgTime } = msgInfo.msgData;
             const userList = await UserAndRoom.findAll({
               attributes: ['userId'],
               where: {
@@ -59,9 +61,33 @@ WebSocket.prototype = {
             });
             userList.forEach((item) => {
               if (this.onlineUsers.has(item.userId)) {
-                this.onlineUsers.get(item.userId).sendText(JSON.stringify(msgInfo.msgData));
+                this.onlineUsers.get(item.userId).sendText(JSON.stringify(msgInfo));
               }
             });
+            const msgToArray = JSON.parse(msgto);
+            const msgToId = msgToArray.length > 0 ? msgToArray[0].userId : '';
+            const msgFromInfo = await getUserInfoByUserId(msgfrom);
+            const msgToInfo = await getUserInfoByUserId(msgToId);
+            if (msgFromInfo.id && msgToInfo.id) {
+              const msgFromPath = await getMsgPath(msgFromInfo.phone);
+              const msgToPath = await getMsgPath(msgToInfo.phone);
+              await saveMsgToLocal(msgFromPath, {
+                friendId: msgToId,
+                userId: msgfrom,
+                addMsg: msg,
+                msgTime,
+                roomId,
+              });
+              await saveMsgToLocal(msgToPath, {
+                friendId: msgToId,
+                userId: msgfrom,
+                addMsg: msg,
+                msgTime,
+                roomId,
+              });
+            } else {
+              console.log('记录保存失败');
+            }
           }
         });
         console.log(this);

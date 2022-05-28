@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2021-12-07 14:12:16
- * @LastEditTime: 2022-04-07 16:58:21
+ * @LastEditTime: 2022-05-26 17:44:03
  * @LastEditors: Vincent
  * @Description: 接口映射
  */
@@ -98,5 +98,8 @@ router.post('/chatroom/addFriend', chatRoomCtrl.addFriendCtrl);
 
 // 根据聊天室id获取聊天记录
 router.get('/chatroom/getChatMsgList', chatRoomCtrl.getMsgListByRoomIdCtrl);
+
+// 根据聊天室id获取好友列表
+router.get('/chatroom/getRoomUserListByRoomId', chatRoomCtrl.getRoomUserListCtrl);
 
 module.exports = router;

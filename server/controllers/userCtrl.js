@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2021-12-07 14:10:37
- * @LastEditTime: 2022-04-07 17:28:48
+ * @LastEditTime: 2022-05-14 14:44:01
  * @LastEditors: Vincent
  * @Description:
  */
@@ -71,7 +71,10 @@ const addUserCtrl = async (ctx) => {
     const result = await addUserInfoModel({ username, password, phone });
     if (result.phone === phone) {
       const newPath = path.join(__dirname, `../statics/databackup/pamid_${result.phone}`);
-      await fsPromise.mkdir(newPath);
+      fsPromise
+        .access(newPath)
+        .then(() => console.log('已存在该路径'))
+        .catch(() => fsPromise.mkdir(newPath));
       ctx.body = setResponseBody(result);
     } else {
       ctx.body = setResponseBody({}, '-1', result.desc);
