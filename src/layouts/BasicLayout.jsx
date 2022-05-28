@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2021-12-31 17:13:48
- * @LastEditTime: 2022-04-11 10:18:22
+ * @LastEditTime: 2022-05-14 16:29:47
  * @LastEditors: Vincent
  * @Description:
  */
@@ -9,7 +9,6 @@ import React, { useEffect, useState } from 'react';
 import { Menu } from 'antd';
 import { UserOutlined, LogoutOutlined } from '@ant-design/icons';
 import { useModel, history } from 'umi';
-import { initWebsocket } from '@/utils/websocket';
 import IconFont from '@/components/IconFont';
 import styles from './BasicLayout.less';
 
@@ -18,6 +17,9 @@ const { SubMenu } = Menu;
 const BasicLayout = (props) => {
   const { initialState, setInitialState } = useModel('@@initialState');
   const [menuConfig, setMenuConfig] = useState([]);
+  const { createWsServer } = useModel('useWebsocket', (model) => ({
+    createWsServer: model.createWsServer,
+  }));
   const { children, route } = props;
   const { currentUser } = initialState;
   // 退出登录
@@ -77,7 +79,7 @@ const BasicLayout = (props) => {
     const routesConfig = route?.children?.filter((item) => item.isRoutes === true) || [];
     setMenuConfig(routesConfig);
     setInitialState((s) => ({ ...s, routeConfig: route }));
-    initWebsocket(window.location.hostname, initialState.currentUser.userId);
+    createWsServer();
   }, []);
 
   return (

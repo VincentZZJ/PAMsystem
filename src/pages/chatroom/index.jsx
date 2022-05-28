@@ -1,14 +1,14 @@
 /*
  * @Author: Vincent
  * @Date: 2022-03-24 10:47:57
- * @LastEditTime: 2022-04-11 13:40:41
+ * @LastEditTime: 2022-05-28 17:08:09
  * @LastEditors: Vincent
  * @Description:
  */
 
 import React, { useEffect, useState } from 'react';
 import PageWrapper from '@/components/PageWrapper';
-import { Input, Form, Button, Empty, Modal, Divider, message } from 'antd';
+import { Input, Form, Button, Empty, Modal, Divider, message, Badge } from 'antd';
 import {
   UserAddOutlined,
   SearchOutlined,
@@ -24,67 +24,16 @@ import {
   getChatRoomInfoService,
   addFriendsService,
   searchFriendsService,
+  getRoomUserListByRoomIdService,
 } from '@/services/pamsystem/chatroom';
-import { formatMsgModel, initWebsocket } from '@/utils/websocket';
+import { formatMsgModel } from '@/utils/utils';
 import moment from 'moment';
 import styles from './index.less';
 
 const FormItem = Form.Item;
 
-const fakeRoom = {
-  roomId: '123',
-  roomName: '群组1',
-  msgList: [
-    {
-      msgId: '1234',
-      userId: '12345',
-      roomList: [],
-      userImg: '#',
-      msgTime: '2022-03-24 19:00:22',
-      msgContent:
-        '下班没呀群聊）移上去可以悬停查看群成员或个人信息群聊）移上去可以悬停查看群成员或个人信息',
-    },
-    {
-      msgId: '1234',
-      userId: '12345',
-      roomList: [],
-      userImg: '#',
-      msgTime: '2022-03-24 19:00:22',
-      msgContent:
-        '下班没呀群聊）移上去可以悬停查看群成员或个人信息群聊）移上去可以悬停查看群成员或个人信息',
-    },
-  ],
-};
-
-const fakeUserList = [
-  {
-    roomId: '123',
-    userName: '群组1',
-    latestMsg:
-      '下班没呀群聊）移上去可以悬停查看群成员或个人信息群聊）移上去可以悬停查看群成员或个人信息',
-    latestMsgTime: '2022-03-24 19:00:22',
-    roomImg: '#',
-  },
-  {
-    roomId: '1233',
-    userName: '群组2',
-    latestMsg:
-      '下班没呀群聊）移上去可以悬停查看群成员或个人信息群聊）移上去可以悬停查看群成员或个人信息',
-    latestMsgTime: '2022-03-24 19:00:22',
-    roomImg: '#',
-  },
-];
-
-const fakeFriends = [
-  {
-    id: '231',
-    userName: '张三',
-    userImg: '#',
-  },
-];
-
 const Page = () => {
-  const [roomList, setRoomList] = useState(new Map());
+  const [roomListMap, setRoomListMap] = useState(new Map());
   const [curChatRoom, setCurChatRoom] = useState({});
   const [showSearchUserModal, setShowSearchUserModal] = useState(false);
   const [addFriendModal, setAddFriendModal] = useState(false);
@@ -95,9 +44,14 @@ const Page = () => {
   const [searchFriends, setSearchFriends] = useState([]);
   const [selectedFriend, setSelectedFriend] = useState({});
   const { initialState } = useModel('@@initialState');
-  // const { msgList } = useModel('useChatRoomModel', (model) => ({ msgList: model.msgList }));
+  const { wsServer } = useModel('useWebsocket', (model) => ({ wsServer: model.wsServer }));
+  const { msgList, clearMsgList } = useModel('useChatRoomModel', (model) => ({
+    msgList: model.msgList,
+    clearMsgList: model.clearMsgList,
+  }));
   const [curMsgList, setCurMsgList] = useState([]);
   const [isRefresh, setIsRefresh] = useState(new Date().valueOf());
+  const [unReadMsgMap, setUnReadMsgMap] = useState(new Map());
 
   //   搜索框查询
   const handleSearchFun = (val) => {
@@ -107,16 +61,18 @@ const Page = () => {
   //   消息发送
   const handleMsgSend = (val) => {
     const userId = initialState.currentUser.userId;
-    if (window.wsServer && window.wsServer.readyState == WebSocket.OPEN) {
+    const { userList = [] } = curChatRoom;
+    const msgToList = userList.filter((item) => item.userId !== userId);
+    if (wsServer && wsServer.readyState === WebSocket.OPEN) {
       const msgData = {
         roomId: curChatRoom.id,
-        msgFrom: userId,
+        msgfrom: userId,
+        msgto: JSON.stringify(msgToList),
         msgTime: moment().format('YYYY-MM-DD HH:mm:ss'),
         msg: val.msg,
       };
-      window.wsServer.send(JSON.stringify(formatMsgModel('chatroommsg', msgData)));
-    } else {
-      initWebsocket(window.location.hostname, userId);
+      wsServer.send(JSON.stringify(formatMsgModel('chatroommsg', msgData)));
+      msgForm.resetFields();
     }
   };
 
@@ -150,6 +106,7 @@ const Page = () => {
         setSelectedFriend({});
         setSearchFriends([]);
         setIsRefresh(new Date().valueOf());
+        addFriendForm.resetFields();
       } else {
         message.error(response?.desc ?? '添加失败');
       }
@@ -160,11 +117,18 @@ const Page = () => {
   };
 
   //   点击切换聊天窗口
-  const handleMsgChange = async (msgInfo) => {
-    if (msgInfo?.id) {
+  const handleMsgChange = async (roomInfo) => {
+    if (roomInfo?.id) {
       try {
-        const response = await getChatRoomInfoService(msgInfo.id);
+        const roomMembersRes = await getRoomUserListByRoomIdService(roomInfo.id);
+        const response = await getChatRoomInfoService({
+          id: roomInfo.id,
+          userId: initialState.currentUser.userId,
+        });
         setCurMsgList(response?.msg ?? []);
+        setCurChatRoom({ ...roomInfo, userList: roomMembersRes?.msg ?? [] });
+        roomListMap.set(roomInfo.id, { ...roomInfo });
+        unReadMsgMap.set(roomInfo.id, 0);
       } catch (e) {
         message.error('操作失败');
         console.log(e);
@@ -172,24 +136,21 @@ const Page = () => {
     }
   };
 
-  // useEffect(() => {
-  //   if (msgList?.length > 0) {
-  //     const list = msgList.filter((item) => item.id === curChatRoom.id);
-  //     setCurMsgList(list);
-  //   }
-  // }, [msgList]);
-
   useEffect(() => {
     //   获取用户列表
     const getRoomList = async (id) => {
       try {
         const response = await getChatRoomListService(id);
         const roomMap = new Map();
+        const unReadMsgMap = new Map();
         if (response && response.code === '0' && response.msg?.length > 0) {
-          response.msg.forEach((item) => roomMap.set(item.id, item));
-          setCurChatRoom(response.msg[0]);
+          response.msg.forEach((item) => {
+            roomMap.set(item.id, { ...item });
+            unReadMsgMap.set(item.id, 0);
+          });
         }
-        setRoomList(roomMap);
+        setRoomListMap(roomMap);
+        setUnReadMsgMap(unReadMsgMap);
       } catch (e) {
         message.error('操作失败');
         console.log(e);
@@ -201,12 +162,26 @@ const Page = () => {
   }, [isRefresh]);
 
   useEffect(() => {
-    // const socket = io('ws://localhost:3000');
-    // console.log(socket);
-    // const socket = new WebSocket(`ws://${window.location.hostname}:3030`);
-    // console.log(socket);
-  }, []);
+    if (msgList?.length > 0) {
+      const { id } = curChatRoom;
+      const list = curMsgList.slice();
+      const newUnReadMsg = _.cloneDeep(unReadMsgMap);
+      msgList.forEach((item) => {
+        if (unReadMsgMap.has(item.roomId) && item.roomId !== id) {
+          const unReadCount = newUnReadMsg.get(item.roomId);
+          newUnReadMsg.set(item.roomId, unReadCount + 1);
+        }
+        if (item.roomId === id) {
+          list.push(item);
+        }
+      });
+      setUnReadMsgMap(newUnReadMsg);
+      setCurMsgList(list);
+      clearMsgList();
+    }
+  }, [msgList]);
 
+  console.log(curChatRoom);
   return (
     <PageWrapper pageTitleCmp="聊天室">
       <div className={styles.wrapBox}>
@@ -215,13 +190,13 @@ const Page = () => {
             <>
               <div className={styles.contentHeader}>
                 <div>{curChatRoom?.roomName ?? '/'}</div>
-                <div>{curChatRoom?.userList?.length > 1 ? <UserOutlined /> : <TeamOutlined />}</div>
+                <div>{curChatRoom?.userList?.length < 3 ? <UserOutlined /> : <TeamOutlined />}</div>
               </div>
               <div className={styles.contentWindow}>
                 {curMsgList?.length > 0
                   ? curMsgList.map((item) => {
                       const itemCls =
-                        item.msgfrom === initialState.currentUser.userId
+                        item.msgfrom === initialState?.currentUser?.userId
                           ? styles.onRightRender
                           : styles.onLeftRender;
                       return (
@@ -297,8 +272,8 @@ const Page = () => {
             </Form>
           </div>
           <div>
-            {roomList.size > 0 ? (
-              Array.from(roomList.values()).map((item) => (
+            {roomListMap.size > 0 ? (
+              Array.from(roomListMap.values()).map((item) => (
                 <div
                   className={`${styles.userItemBox} ${
                     curChatRoom.id === item.id ? styles.selectedItem : ''
@@ -306,7 +281,12 @@ const Page = () => {
                   onClick={() => handleMsgChange(item)}
                 >
                   <div>
-                    <img src={item?.roomImg ?? '#'} />
+                    <Badge
+                      count={unReadMsgMap.has(item.id) ? unReadMsgMap.get(item.id) : 0}
+                      overflowCount={5}
+                    >
+                      <img src={item?.roomImg ?? '#'} />
+                    </Badge>
                   </div>
                   <div>
                     <div>
@@ -390,6 +370,7 @@ const Page = () => {
           onCancel={() => {
             setAddFriendModal(false);
             setSelectedFriend({});
+            addFriendForm.resetFields();
           }}
         >
           <Form layout="vertical" form={addFriendForm} onFinish={handleAddFriends}>
