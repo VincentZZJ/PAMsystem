@@ -94,6 +94,30 @@ ol {
   }
 }
 
+// 滚动条封装的函数
+.initScrollStyle(@scrollWidty) {
+  &::-webkit-scrollbar {
+    width: unit(@scrollWidty / @baseFontSize, rem);
+  }
+
+  // 边角，两个滚动条交汇处
+  // &::-webkit-scrollbar-corner {
+  //   background-color: @primary-color;
+  // }
+
+  /* 外层轨道 */
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 0;
+  }
+
+  /* 滚动条滑块 */
+  &::-webkit-scrollbar-thumb {
+    background: #a8a8a8;
+    border-radius: unit(@scrollWidty / @baseFontSize, rem);
+  }
+}
+
 // @divider
 .ant-divider-vertical {
   margin: 0 0.2rem !important;

@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2022-02-11 10:23:48
- * @LastEditTime: 2022-04-06 15:57:32
+ * @LastEditTime: 2022-05-30 16:59:01
  * @LastEditors: Vincent
  * @Description:
  */
@@ -259,7 +259,7 @@ const Page = () => {
                 dateCellRender={renderDateCellCmp}
               />
             </div>
-            <div>
+            <div className={styles.diaryBrief}>
               <div className={styles.rightTop}>
                 <div>{curSelectedDate.format('YYYY-MM-DD')}</div>
                 <div>

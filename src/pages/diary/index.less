@@ -1,4 +1,4 @@
-@import '../../baseStyles.less';
+@import '../../global.less';
 
 .contentWrap {
   display: flex;
@@ -12,9 +12,24 @@
     margin-bottom: 0.5rem;
     & > div:first-child {
       flex-grow: 1;
-      overflow: hidden;
+      overflow-y: auto;
+      .initScrollStyle(5);
+      // 滚动条整体部分
+      // &::-webkit-scrollbar {
+      //   width: unit(5 / @baseFontSize, rem);
+      // }
+      // /* 外层轨道 */
+      // &::-webkit-scrollbar-track {
+      //   background: #f1f1f1;
+      //   border-radius: 0;
+      // }
+      // /* 滚动条滑块 */
+      // &::-webkit-scrollbar-thumb {
+      //   background: #a8a8a8;
+      //   border-radius: unit(10 / @baseFontSize, rem);
+      // }
     }
-    & > div:last-child {
+    .diaryBrief {
       width: unit(400 / @baseFontSize, rem);
       min-width: unit(400 / @baseFontSize, rem);
       margin-left: 0.5rem;
