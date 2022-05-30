@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2022-03-24 10:47:57
- * @LastEditTime: 2022-05-28 17:08:09
+ * @LastEditTime: 2022-05-30 17:52:05
  * @LastEditors: Vincent
  * @Description:
  */
@@ -125,10 +125,11 @@ const Page = () => {
           id: roomInfo.id,
           userId: initialState.currentUser.userId,
         });
+        const newUnReadMsgMap = _.cloneDeep(unReadMsgMap);
         setCurMsgList(response?.msg ?? []);
         setCurChatRoom({ ...roomInfo, userList: roomMembersRes?.msg ?? [] });
-        roomListMap.set(roomInfo.id, { ...roomInfo });
-        unReadMsgMap.set(roomInfo.id, 0);
+        newUnReadMsgMap.set(roomInfo.id, 0);
+        setUnReadMsgMap(newUnReadMsgMap);
       } catch (e) {
         message.error('操作失败');
         console.log(e);
