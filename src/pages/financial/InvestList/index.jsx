@@ -46,6 +46,7 @@ const Page = () => {
   const [updateModalVisible, setUpdateModalVisible] = useState(false);
   const [isRefresh, setIsRefresh] = useState('');
   const [curRecord, setCurRecord] = useState({});
+  const [investOpt, setInvestOpt] = useState('1');
   const { initialState } = useModel('@@initialState');
 
   const columns = [
@@ -241,9 +242,10 @@ const Page = () => {
           </span>
         ),
       },
-      { title: '成交价格', dataIndex: 'investCost' },
-      { title: '成交数量', dataIndex: 'investNum' },
+      { title: '成交价格', dataIndex: 'investCost', render: (text) => text ?? '/' },
+      { title: '成交数量', dataIndex: 'investNum', render: (text) => text ?? '/' },
       { title: '成交后成本', dataIndex: 'latestCost' },
+      { title: '分红', dataIndex: 'bouns', render: (text) => text ?? '/' },
     ];
     return <Table pagination={false} columns={columns} dataSource={record?.optHistory ?? []} />;
   };
@@ -385,22 +387,35 @@ const Page = () => {
     }
   };
 
-  const updateLatestInfo = (investCost, investNum) => {
-    const optType = updateForm.getFieldValue('investOpt');
+  // 更新数据
+  const updateLatestInfo = (inc = 0, inn = 0) => {
     const { totalInvest, position, cost } = curRecord;
+    const fieldsValue = updateForm.getFieldsValue();
     let investMoney = totalInvest;
     let num = position;
-    if (optType === '1') {
+    if (investOpt === '1') {
       // 加仓
-      investMoney = investMoney + investCost * investNum;
-      num = position + investNum;
-    } else if (optType === '2') {
+      investMoney = investMoney + inc * inn;
+      num = position + inn;
+    } else if (investOpt === '2') {
       // 减仓
-      num = position - investNum;
-      investMoney = num ? investMoney - investCost * investNum : 0;
+      num = position - inn;
+      investMoney = num ? investMoney - inc * inn : 0;
     }
-    const profit = position * (investCost - cost);
-    const latestCost = num ? parseFloat(investMoney / num) : 0;
+    let profit = 0;
+    let latestCost = 0;
+    let investCost = inc;
+    if (investOpt === '4') {
+      // 现金分红
+      const { afterBounsPrice, afterBounsCost, bouns } = fieldsValue;
+      investMoney -= bouns;
+      latestCost = afterBounsCost;
+      investCost = afterBounsPrice;
+      profit = position * (investCost - latestCost);
+    } else {
+      profit = position * (investCost - cost);
+      latestCost = num ? parseFloat(investMoney / num) : 0;
+    }
     // const latestMoney = totalMoney + profit;
     // const profit = latestMoney - investMoney;
     setLatestInfo({
@@ -433,6 +448,12 @@ const Page = () => {
     } catch (e) {
       console.log(e);
     }
+  };
+
+  // 交易操作切换
+  const handleInvestOptChange = (ev) => {
+    const { value } = ev.target;
+    setInvestOpt(value);
   };
 
   useEffect(() => {
@@ -710,27 +731,55 @@ const Page = () => {
                 <span>{curRecord?.position ?? '/'}手</span>当前总投资：
                 <span>{curRecord?.totalInvest ?? '/'}元</span>
               </div>
-              <Form.Item label="交易操作" name="investOpt" required initialValue="1">
-                <Radio.Group>
+              <Form.Item label="交易操作" name="investOpt" required initialValue={investOpt}>
+                <Radio.Group onChange={handleInvestOptChange} value={investOpt}>
                   {Object.keys(InvestOpt).map((item) => (
-                    <Radio.Button value={item}>{InvestOpt[item]}</Radio.Button>
+                    <Radio.Button key={item} value={item}>
+                      {InvestOpt[item]}
+                    </Radio.Button>
                   ))}
                 </Radio.Group>
               </Form.Item>
               <Form.Item label="成交时间" name="date" required>
                 <DatePicker style={{ width: '100%' }} />
               </Form.Item>
-              <Form.Item label="交易价" name="investCost" required>
-                <Input placeholder="(加/减)价位" onChange={(ev) => handleInvestCostChange(ev)} />
-              </Form.Item>
-              <Form.Item label="交易量" name="investNum" required>
-                <Input
-                  placeholder="(加/减)多少手 -- 最低100手"
-                  suffix="手"
-                  onChange={(ev) => handleInvestNumChange(ev)}
-                />
-              </Form.Item>
+              {investOpt === '4' ? (
+                <>
+                  <Form.Item label="现金分红" name="bouns" required>
+                    <Input placeholder="现金分红" onChange={(ev) => handleInvestCostChange(ev)} />
+                  </Form.Item>
+                  <Form.Item label="最新价格" name="afterBounsPrice" required>
+                    <Input placeholder="最新价格" onChange={(ev) => handleInvestCostChange(ev)} />
+                  </Form.Item>
+                  <Form.Item label="最新成本" name="afterBounsCost" required>
+                    <Input placeholder="最新价格" onChange={(ev) => handleInvestCostChange(ev)} />
+                  </Form.Item>
+                </>
+              ) : (
+                <>
+                  <Form.Item label="交易价" name="investCost" required>
+                    <Input
+                      placeholder="(加/减)价位"
+                      onChange={(ev) => handleInvestCostChange(ev)}
+                    />
+                  </Form.Item>
+                  <Form.Item label="交易量" name="investNum" required>
+                    <Input
+                      placeholder="(加/减)多少手 -- 最低100手"
+                      suffix="手"
+                      onChange={(ev) => handleInvestNumChange(ev)}
+                    />
+                  </Form.Item>
+                </>
+              )}
               <div className={styles.afterOpt}>
+                <SyncOutlined
+                  style={{ color: '#000', marginLeft: '0.4rem', marginRight: '0.2rem' }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    updateLatestInfo();
+                  }}
+                />
                 更新成本：<span>{formatMoney(latestInfo?.latestCost)}元</span>更新总投资：
                 <span>{formatMoney(latestInfo?.totalInvest)}元</span>盈亏：
                 <span className={`${latestInfo?.profit > 0 ? 'redCls' : 'greenCls'}`}>
