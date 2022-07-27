@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2022-01-10 15:45:58
- * @LastEditTime: 2022-07-23 15:42:11
+ * @LastEditTime: 2022-07-27 15:17:17
  * @LastEditors: Vincent
  * @Description:
  */
@@ -76,7 +76,7 @@ const getInvestListByOptionsModel = async (data) => {
     let allMoney = 0; // 在投项目的市值
     result.rows.forEach((item) => itemIds.push(`'${item.id}'`));
     const recordList = await PamDatabase.query(
-      `select * from invest_record as a INNER join invest_history as b ON a.id = b.recordId where b.itemId in (${itemIds.toString()})`,
+      `select * from invest_record as a INNER join invest_history as b ON a.id = b.recordId where b.itemId in (${itemIds.toString()}) order by date desc`,
     );
     const userCountInfo = await InvestUserCount.findOne({
       where: {
