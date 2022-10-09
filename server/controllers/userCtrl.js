@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2021-12-07 14:10:37
- * @LastEditTime: 2022-05-14 14:44:01
+ * @LastEditTime: 2022-09-13 10:03:45
  * @LastEditors: Vincent
  * @Description:
  */
@@ -70,11 +70,11 @@ const addUserCtrl = async (ctx) => {
   try {
     const result = await addUserInfoModel({ username, password, phone });
     if (result.phone === phone) {
-      const newPath = path.join(__dirname, `../statics/databackup/pamid_${result.phone}`);
-      fsPromise
-        .access(newPath)
-        .then(() => console.log('已存在该路径'))
-        .catch(() => fsPromise.mkdir(newPath));
+      // const newPath = path.join(__dirname, `../statics/databackup/pamid_${result.phone}`);
+      // fsPromise
+      //   .access(newPath)
+      //   .then(() => console.log('已存在该路径'))
+      //   .catch(() => fsPromise.mkdir(newPath));
       ctx.body = setResponseBody(result);
     } else {
       ctx.body = setResponseBody({}, '-1', result.desc);
@@ -122,10 +122,28 @@ const updateUserInfoByIdCtrl = async (ctx) => {
   }
 };
 
+/**
+ * @description: 用户登出
+ * @param {*} ctx
+ * @return {*}
+ */
+const userLogoutCtrl = async (ctx) => {
+  try {
+    const userId = ctx.cookies.get('userId');
+    console.log(userId);
+    await Store.del(userId);
+    ctx.cookies.set('userId', '');
+    ctx.body = setResponseBody();
+  } catch (e) {
+    ctx.body = setResponseBody(e, '-1', '服务出错');
+  }
+};
+
 module.exports = {
   getUserInfoCtrl,
   addUserCtrl,
   delUserCtrl,
   updateUserInfoByIdCtrl,
   userLoginCtrl,
+  userLogoutCtrl,
 };

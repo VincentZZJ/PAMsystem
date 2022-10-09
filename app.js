@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2021-12-06 14:24:17
- * @LastEditTime: 2022-04-06 16:05:43
+ * @LastEditTime: 2022-09-12 23:27:55
  * @LastEditors: Vincent
  * @Description:
  */
@@ -58,7 +58,7 @@ ws.createServer();
 // console.log(WS.prototype.createServer());
 
 // 配置静态资源目录
-app.use(koaStatic(__dirname + '/server/statics/databackup'));
+app.use(koaStatic(__dirname + '/server/statics'));
 
 // 日志
 app.use(async (ctx, next) => {

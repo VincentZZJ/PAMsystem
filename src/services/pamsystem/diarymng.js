@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2022-02-11 19:55:16
- * @LastEditTime: 2022-02-18 17:33:34
+ * @LastEditTime: 2022-09-12 11:16:52
  * @LastEditors: Vincent
  * @Description:
  */
@@ -28,6 +28,15 @@ export async function saveDiaryInfoService(data) {
   });
 }
 
+// 修改日记
+export async function updateDiaryInfoService(data) {
+  return request(`/pamsystem/diarymng/updateDiaryInfo`, {
+    method: 'put',
+    data,
+  });
+}
+
+// 根据id删除附件
 export async function deleteAttachmentByIdService(id) {
   return request(`/pamsystem/diarymng/delAttachmentById?id=${id}`, {
     method: 'delete',

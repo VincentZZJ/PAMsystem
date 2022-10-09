@@ -1,7 +1,7 @@
 /*
  * @Author: Vincent
  * @Date: 2022-02-11 10:23:48
- * @LastEditTime: 2022-05-30 16:59:01
+ * @LastEditTime: 2022-10-09 16:39:00
  * @LastEditors: Vincent
  * @Description:
  */
@@ -27,6 +27,7 @@ import {
   getDiaryByOptionsService,
   deleteDiaryByIdService,
   saveDiaryInfoService,
+  updateDiaryInfoService,
   deleteAttachmentByIdService,
 } from '@/services/pamsystem/diarymng';
 import _ from 'lodash';
@@ -79,20 +80,44 @@ const Page = () => {
   const handleDiarySave = async () => {
     const fieldValues = diaryForm.getFieldsValue();
     const { diaryTitle, diaryContent } = fieldValues;
+    console.log(fileList);
     if (diaryTitle === '' || diaryContent === '') {
       message.warning('标题或内容不能为空！');
       return;
     }
-    const userId = initialState.currentUser.userId;
     const params = {
       diaryTitle,
       diaryContent,
-      userId,
-      date: curSelectedDate.format('YYYY-MM-DD'),
     };
-    const diaryId = diaryInfo?.id || createDiaryId();
+    const files = [];
+    if (fileList?.length > 0) {
+      fileList.forEach((item) => {
+        if (item?.response?.code === '0') {
+          files.push({
+            ...item.response.msg,
+          });
+        }
+        if (item?.isEdit) {
+          files.push({
+            ...item,
+          });
+        }
+      });
+    }
+    params.fileList = files;
     try {
-      const result = await saveDiaryInfoService({ ...params, id: diaryId });
+      let result = null;
+      if (diaryInfo?.id) {
+        result = await updateDiaryInfoService({
+          ...params,
+          id: diaryInfo.id,
+        });
+      } else {
+        result = await saveDiaryInfoService({
+          ...params,
+          date: curSelectedDate.format('YYYY-MM-DD'),
+        });
+      }
       if (result && result.code === '0') {
         message.success('保存成功');
         setShowEditPage(false);
@@ -105,13 +130,6 @@ const Page = () => {
     }
   };
 
-  // 新生成日记id（userId后8位拼接当日时间戳前8位）
-  const createDiaryId = () => {
-    const userId = initialState.currentUser.userId;
-    const t = curSelectedDate.startOf('day').valueOf().toString();
-    return `${userId.substring(0, userId.length - 8)}${t.substring(0, 8)}`;
-  };
-
   // 新增或修改日记
   const handleShowEdit = () => {
     setShowEditPage(true);
@@ -122,7 +140,8 @@ const Page = () => {
           ...item,
           uuid: item.id,
           status: 'done',
-          url: item.fileUrl,
+          isEdit: true,
+          url: item.serverUrl,
         });
       });
     }
@@ -300,7 +319,7 @@ const Page = () => {
             {attachmentList.length > 0 ? (
               <Image.PreviewGroup>
                 {attachmentList.map((item) => (
-                  <Image className={styles.imageCls} src={item.fileUrl} />
+                  <Image key={item.id} className={styles.imageCls} src={item.serverUrl} />
                 ))}
               </Image.PreviewGroup>
             ) : (
@@ -336,10 +355,7 @@ const Page = () => {
               <Upload
                 accept="image/*"
                 action="/pamsystem/uploadFile"
-                data={{
-                  phone: initialState.currentUser.phone,
-                  diaryId: diaryInfo?.id || createDiaryId(),
-                }}
+                name="file"
                 listType="picture-card"
                 fileList={fileList}
                 onPreview={handlePreview}

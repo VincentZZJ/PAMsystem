@@ -1,13 +1,13 @@
 /*
  * @Author: Vincent
  * @Date: 2022-02-12 15:06:26
- * @LastEditTime: 2022-02-18 17:29:40
+ * @LastEditTime: 2022-09-12 11:24:28
  * @LastEditors: Vincent
  * @Description:
  */
 
 const { Mysql, PamDatabase } = require('../config/mysql');
-const sequelize = require('sequelize');
+// const sequelize = require('sequelize');
 const UUID = require('node-uuid');
 const DiaryList = Mysql.diary_list;
 const AttachmentList = Mysql.attachment_list;
@@ -95,34 +95,34 @@ const deleteDiaryByIdModel = async (id) => {
  */
 const saveDiaryInfoModel = async (data) => {
   const { id, diaryTitle, diaryContent, date, userId } = data;
-  const hasDiary = await DiaryList.findOne({
-    where: {
-      id: id,
-    },
+  await DiaryList.create({
+    id,
+    diaryTitle,
+    diaryContent,
+    userId,
+    date,
   });
-  if (hasDiary) {
-    //   存在则更新
-    await DiaryList.update(
-      {
-        diaryTitle,
-        diaryContent,
-      },
-      {
-        where: {
-          id: id,
-        },
-      },
-    );
-  } else {
-    //   不存在则新建
-    await DiaryList.create({
-      id,
+  return true;
+};
+
+/**
+ * @description: 修改日记信息
+ * @param {*} data
+ * @return {*}
+ */
+const updateDiaryInfoModel = async (data) => {
+  const { id, diaryTitle, diaryContent } = data;
+  await DiaryList.update(
+    {
       diaryTitle,
       diaryContent,
-      userId,
-      date,
-    });
-  }
+    },
+    {
+      where: {
+        id: id,
+      },
+    },
+  );
   return true;
 };
 
@@ -161,4 +161,5 @@ module.exports = {
   getDiaryStatByMonth,
   saveFileToDiaryModel,
   delFileByIdModel,
+  updateDiaryInfoModel,
 };
